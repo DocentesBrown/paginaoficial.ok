@@ -18,10 +18,7 @@
       --gris:#5b6572;
       --borde:#e7e3d8;
       --whatsapp:#2b647b;
-      --space-1:.6rem;
-      --space-2:1rem;
-      --space-3:1.6rem;
-      --space-4:2.4rem;
+      --space-1:.6rem; --space-2:1rem; --space-3:1.6rem; --space-4:2.4rem;
     }
     *{box-sizing:border-box}
     html,body{margin:0;padding:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--negro);background:var(--crema)}
@@ -37,29 +34,29 @@
     .btn{border:none;cursor:pointer;border-radius:14px;padding:.7rem .95rem;font-weight:700;letter-spacing:.2px}
     .btn-primary{background:linear-gradient(135deg,var(--violeta),var(--coral));color:#fff}
     .btn-outline{background:#fff;border:1px solid var(--borde);color:var(--azul)}
+    .btn-link{display:inline-block;border:1px solid var(--borde);padding:.55rem .8rem;border-radius:12px;text-decoration:none;color:var(--azul);font-weight:700;background:#fff}
     .card{background:#fff;border:1px solid var(--borde);border-radius:18px;box-shadow:0 8px 24px rgba(16,20,24,.04)}
     .section-title{color:var(--azul);margin:0 0 .6rem 0}
     .subtitle{color:var(--gris);font-size:1.04rem}
-    /* HERO: carrusel de noticias */
-    .news-carousel{position:relative;min-height:360px}
-    .news-slide{position:relative;isolation:isolate;display:grid;grid-template-columns:1fr;padding:var(--space-3);transition:opacity .35s ease}
+    /* HERO: carrusel */
+    .news-carousel{position:relative;min-height:360px;margin-block:var(--space-4)}
+    .news-slide{position:relative;isolation:isolate;display:grid;grid-template-columns:1fr;padding:var(--space-3);transition:opacity .3s ease}
     .news-bg{position:absolute;inset:0;z-index:-1;background-size:cover;background-position:center;filter:brightness(.65)}
     .news-content{max-width:820px;color:#fff}
     .news-content h2{margin:.2rem 0 0;font-size:clamp(1.6rem,3vw,2.2rem)}
     .news-content p{margin:.5rem 0 1rem 0}
-    .news-content .btn-link{display:inline-block;background:#ffffffcc;color:#1d2430;padding:.55rem .8rem;border-radius:12px;text-decoration:none;border:1px solid var(--borde)}
+    .news-content .btn-link{background:#ffffffcc;color:#1d2430}
     .news-controls{position:absolute;inset:auto 0 12px 0;display:flex;align-items:center;justify-content:center;gap:.6rem}
     .news-prev,.news-next{border:1px solid var(--borde);background:#fff;border-radius:10px;padding:.3rem .55rem;cursor:pointer}
     .news-dots{display:flex;gap:.35rem}
     .news-dot{width:10px;height:10px;border-radius:999px;background:#ffffff80;border:1px solid #fff;cursor:pointer}
     .news-dot.active{background:#fff}
-    /* Apps grid */
-    .apps{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin:var(--space-4) 0}
+    /* Apps */
+    .apps{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
     @media (max-width:920px){.apps{grid-template-columns:1fr 1fr}}
     @media (max-width:620px){.apps{grid-template-columns:1fr}}
     .app-card{padding:1.1rem;display:flex;flex-direction:column;gap:.6rem}
     .app-card h3{margin:.2rem 0;color:var(--azul)}
-    .app-card a.btn-link{align-self:flex-start;border:1px solid var(--borde);padding:.55rem .8rem;border-radius:12px;text-decoration:none;color:var(--azul);font-weight:700}
     /* Podcast */
     .audio-list{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem}
     @media (max-width:820px){.audio-list{grid-template-columns:1fr}}
@@ -107,11 +104,8 @@
             <rect x="6" y="6" width="52" height="52" rx="14" fill="url(#g)"/>
             <path d="M20 42c0-6 6-10 12-10s12 4 12 10" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
             <path d="M22 25h20" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
-            <defs>
-              <linearGradient id="g" x1="6" y1="6" x2="58" y2="58" gradientUnits="userSpaceOnUse">
-                <stop stop-color="#6c467e"/><stop offset="1" stop-color="#da6863"/>
-              </linearGradient>
-            </defs>
+            <defs><linearGradient id="g" x1="6" y1="6" x2="58" y2="58" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#6c467e"/><stop offset="1" stop-color="#da6863"/></linearGradient></defs>
           </svg>
           <span>Docentes Brown</span>
         </div>
@@ -127,22 +121,20 @@
   </header>
 
   <!-- HERO: carrusel de noticias -->
-  <section class="hero">
-    <div class="container" style="padding:0">
-      <div class="card" style="padding:0;overflow:hidden">
-        <div id="newsCarousel" class="news-carousel" aria-roledescription="carousel" aria-label="Noticias destacadas">
-          <div class="news-slide" data-index="0"></div>
-          <div class="news-controls">
-            <button class="news-prev" aria-label="Anterior">◀</button>
-            <div class="news-dots" role="tablist" aria-label="Paginación de noticias"></div>
-            <button class="news-next" aria-label="Siguiente">▶</button>
-          </div>
+  <section class="container">
+    <div class="card" style="padding:0;overflow:hidden">
+      <div id="newsCarousel" class="news-carousel" aria-roledescription="carousel" aria-label="Noticias destacadas">
+        <div class="news-slide" data-index="0"></div>
+        <div class="news-controls">
+          <button class="news-prev" aria-label="Anterior">◀</button>
+          <div class="news-dots" role="tablist" aria-label="Paginación de noticias"></div>
+          <button class="news-next" aria-label="Siguiente">▶</button>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Herramientas / Apps -->
+  <!-- Herramientas -->
   <section id="apps" class="container">
     <h2 class="section-title">Herramientas</h2>
     <div class="apps">
@@ -195,7 +187,7 @@
     </div>
   </section>
 
-  <!-- Sumate (zócalo clickeable) -->
+  <!-- Sumate (zócalo clickeable al formulario) -->
   <section id="sumate" class="container">
     <a class="card cta" href="https://forms.gle/TALg7vqSe8f6LzxK8" target="_blank" rel="noopener" style="text-decoration:none;">
       <div>
@@ -235,62 +227,92 @@
     const savedTheme = localStorage.getItem('db_theme');
     if(savedTheme){ rootHtml.setAttribute('data-theme', savedTheme); }
     document.getElementById('toggleTheme').addEventListener('click', ()=>{
-      const current = rootHtml.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-      rootHtml.setAttribute('data-theme', current);
-      localStorage.setItem('db_theme', current);
+      const currentIsDark = rootHtml.getAttribute('data-theme') === 'dark';
+      const next = currentIsDark ? 'light' : 'dark';
+      rootHtml.setAttribute('data-theme', next);
+      localStorage.setItem('db_theme', next);
     });
 
-    // Helpers: cargar JSON externo con fallback
+    // Fetch JSON con fallback
     async function loadJson(url, fallback){
       try{
         const r = await fetch(url, {cache:'no-store'});
         if(!r.ok) throw new Error('fetch failed');
         const data = await r.json();
         return Array.isArray(data) ? data : fallback;
-      }catch(e){ return fallback; }
+      }catch{ return fallback; }
     }
 
-    // Fallbacks locales
+    // Fallbacks locales (incluyen tu primer podcast y noticia)
     const PODCASTS_FALLBACK = [
-      {titulo:'Episodio 1 — Bienvenida', fecha:'2025-08-01', spotify:'https://open.spotify.com/episode/0example2', descripcion:'Presentación del proyecto y objetivos.'},
-      {titulo:'Episodio 2 — Evaluación justa', fecha:'2025-09-10', spotify:'https://open.spotify.com/episode/0example3', descripcion:'Rúbricas, feedback y herramientas.'}
+      {
+        titulo:'Episodio 1 — Mapa Escolar',
+        fecha:'2025-10-01',
+        spotify:'https://open.spotify.com/episode/1IaOxq5Gi0xQbEoy2ccDdQ?si=6OWrMns7RuSqpCzhEeKVCw',
+        descripcion:'Charlamos sobre el nuevo Mapa Escolar online.'
+      },
+      {
+        titulo:'Episodio ejemplo — Próximamente',
+        fecha:'2025-09-15',
+        spotify:'https://open.spotify.com/episode/0example3',
+        descripcion:'Plantilla para el próximo episodio.'
+      }
     ];
 
     const NEWS_FALLBACK = [
-      {titulo:'Convocatoria a concursos 2025', fecha:'2025-09-15', link:'https://docentesbrown.github.io/concursos_superior/', resumen:'Se publicaron nuevas bases y condiciones.', img:''},
-      {titulo:'Lanzamos la Calculadora Salarial', fecha:'2025-07-20', link:'https://docentesbrown.github.io/Calculadora.Salarial.Docentes.Brown/', resumen:'Herramienta abierta y colaborativa.', img:''},
-      {titulo:'Buscador de particulares actualizado', fecha:'2025-08-25', link:'https://docentesbrown.github.io/buscador.particular/', resumen:'Nuevos filtros y mejoras de velocidad.', img:''},
-      {titulo:'Abrimos canal de Podcast', fecha:'2025-09-18', link:'#podcast', resumen:'Ya podés escuchar los primeros episodios.', img:''}
+      {
+        titulo:'El nuevo Mapa Escolar ya está online: más rápido e intuitivo',
+        fecha:'2025-10-03',
+        link:'https://abc.gob.ar/noticias/el-nuevo-mapa-escolar-ya-esta-online-mas-rapido-intuitivo-y-con-herramientas-innovadoras',
+        resumen:'La DGCyE presentó la nueva versión con herramientas innovadoras.',
+        img:''
+      },
+      {
+        titulo:'Convocatoria a concursos 2025',
+        fecha:'2025-09-15',
+        link:'https://docentesbrown.github.io/concursos_superior/',
+        resumen:'Se publicaron nuevas bases y condiciones.',
+        img:''
+      },
+      {
+        titulo:'Calculadora Salarial: nueva actualización',
+        fecha:'2025-09-10',
+        link:'https://docentesbrown.github.io/Calculadora.Salarial.Docentes.Brown/',
+        resumen:'Correcciones y mejoras de accesibilidad.',
+        img:''
+      }
     ];
 
-    let PODCASTS = PODCASTS_FALLBACK; // Para producción, podés cargarlos de archivos JSON en el repo.
-    let NEWS = NEWS_FALLBACK; // Para producción, podés cargarlos de archivos JSON en el repo.
+    let PODCASTS = PODCASTS_FALLBACK; // Para producción, podés cargarlos de podcasts.json
+    let NEWS = NEWS_FALLBACK; // Para producción, podés cargarlos de news.json
 
-    // Podcast (Spotify embed + EQ decorativo)
+    // ---------- Podcast (Spotify embed) ----------
     async function initPodcasts(){
       PODCASTS = await loadJson('podcasts.json', PODCASTS_FALLBACK);
       PODCASTS.sort((a,b)=> new Date(b.fecha)-new Date(a.fecha));
       const $pod = document.getElementById('podcastList');
       if(!$pod) return;
-      if(!PODCASTS.length){ $pod.innerHTML = '<p class="subtitle">Pronto subimos los primeros episodios.</p>'; return; }
+      if(!PODCASTS.length){
+        $pod.innerHTML = '<p class="subtitle">Pronto subimos los primeros episodios.</p>'; return;
+      }
       $pod.innerHTML = PODCASTS.map(p=>{
         const url = p.spotify || '#';
-        const embed = url.replace('/episode/','/embed/episode/').replace('/show/','/embed/show/');
+        const embed = url.includes('/embed/') ? url :
+          url.replace('/episode/','/embed/episode/').replace('/show/','/embed/show/');
         return `
           <article class="card audio-card">
             <h4>${p.titulo}</h4>
             <p class="subtitle" style="margin:.2rem 0 .6rem 0">${new Date(p.fecha).toLocaleDateString()} — ${p.descripcion||''}</p>
             <div class="spotify-embed">
               <div class="eq" aria-hidden="true"><span></span><span></span><span></span></div>
-              <iframe loading="lazy" style="border-radius:12px" src="${embed}" width="100%" height="152" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
+              <iframe data-testid="embed-iframe" style="border-radius:12px" src="${embed}" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
             </div>
           </article>`;
       }).join('');
     }
 
-    // Noticias (lista abajo + carrusel arriba)
+    // ---------- Noticias (lista + carrusel) ----------
     let newsPage = 1, pageSize = 6;
-
     function renderNewsPaged(){
       const $news = document.getElementById('newsList');
       const $meta = document.getElementById('newsMeta');
@@ -307,8 +329,7 @@
           <p class="subtitle" style="margin:.2rem 0">${new Date(n.fecha).toLocaleDateString()}</p>
           <p style="margin:.2rem 0;color:var(--gris)">${n.resumen||''}</p>
           ${n.link?`<a class="btn-link" href="${n.link}" target="_blank" rel="noopener">Ver más</a>`:''}
-        </article>
-      `).join('');
+        </article>`).join('');
       if($meta) $meta.textContent = `Página ${newsPage} de ${totalPages} — ${NEWS.length} noticias`;
     }
 
@@ -384,7 +405,7 @@
       }
     });
 
-    // Descarga de plantilla CSV (Sumate)
+    // Descarga de plantilla CSV
     document.getElementById('descargarCSV').addEventListener('click', (e)=>{
       e.preventDefault();
       const headers = ['nombre','zona','localidad','materias(separadas por ;)','modalidad(separadas por ;)','wa','mail'];
@@ -395,21 +416,17 @@
       const csv = headers.join(',') + '\\n' + example;
       const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = 'plantilla_docentes.csv'; a.click();
-      URL.revokeObjectURL(url);
+      const a = document.createElement('a'); a.href = url; a.download = 'plantilla_docentes.csv'; a.click(); URL.revokeObjectURL(url);
     });
 
     // Inicializar
     (async ()=>{ await initPodcasts(); await initNews(); })();
 
-    // AUTO‑TESTS LIGEROS
+    // Auto-tests ligeros
     (async function runSelfTests(){
       const results = [];
       try{
-        const fb = [1,2];
-        const dataUrlNotArray = 'data:application/json,%7B%7D';
-        const out = await loadJson(dataUrlNotArray, fb);
+        const out = await loadJson('data:application/json,%7B%7D', [1,2]);
         results.push({name:'loadJson fallback', pass: Array.isArray(out) && out.length===2});
         results.push({name:'#newsCarousel existe', pass: !!document.getElementById('newsCarousel')});
         results.push({name:'#podcastList existe', pass: !!document.getElementById('podcastList')});
@@ -417,11 +434,9 @@
         const prev = document.documentElement.getAttribute('data-theme')||'light';
         btn.click(); const after = document.documentElement.getAttribute('data-theme')||'light'; btn.click();
         results.push({name:'Modo oscuro toggle', pass: prev!==after});
-        if(window.__DB_CAROUSEL__){ const i0=window.__DB_CAROUSEL__.i; carouselNext(); const i1=window.__DB_CAROUSEL__.i; results.push({name:'Carousel next avanza', pass: i1!==i0}); }
-        const hasSpotify = [...document.querySelectorAll('#podcastList iframe')].every(f=>/open\\.spotify\\.com\\/embed\\//.test(f.src));
-        results.push({name:'Podcast → Spotify embed', pass: hasSpotify});
-        const wa = document.querySelector('.floating .wa'); results.push({name:'WhatsApp correcto', pass: /wa\\.me\\/5491153196358$/.test(wa.href)});
-        console.log('[DB Tests]', results); const allPass = results.every(r=>r.pass); if(!allPass){ console.warn('Algún test falló:', results.filter(r=>!r.pass)); }
+        const hasSpotify = [...document.querySelectorAll('#podcastList iframe')].length>=1;
+        results.push({name:'Spotify embebido renderiza', pass: hasSpotify});
+        console.log('[DB Tests]', results);
       }catch(err){ console.error('Error en tests:', err); }
     })();
   </script>

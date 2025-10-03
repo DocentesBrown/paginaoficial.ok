@@ -1,23 +1,23 @@
 [
   {
-    "titulo": "El nuevo Mapa Escolar ya está online",
-    "fecha": "2025-06-25",
+    "titulo": "El nuevo Mapa Escolar ya está online: más rápido e intuitivo",
+    "fecha": "2025-10-03",
     "link": "https://abc.gob.ar/noticias/el-nuevo-mapa-escolar-ya-esta-online-mas-rapido-intuitivo-y-con-herramientas-innovadoras",
-    "resumen": "más rápido, intuitivo y con herramientas innovadoras",
+    "resumen": "La DGCyE presentó la nueva versión con herramientas innovadoras.",
     "img": ""
   },
   {
-    "titulo": "Lanzamos la Calculadora Salarial",
-    "fecha": "2025-07-20",
+    "titulo": "Convocatoria a concursos 2025",
+    "fecha": "2025-09-15",
+    "link": "https://docentesbrown.github.io/concursos_superior/",
+    "resumen": "Se publicaron nuevas bases y condiciones.",
+    "img": ""
+  },
+  {
+    "titulo": "Calculadora Salarial: nueva actualización",
+    "fecha": "2025-09-10",
     "link": "https://docentesbrown.github.io/Calculadora.Salarial.Docentes.Brown/",
-    "resumen": "Herramienta abierta y colaborativa.",
-    "img": ""
-  },
-  {
-    "titulo": "Buscador de particulares actualizado",
-    "fecha": "2025-08-25",
-    "link": "https://docentesbrown.github.io/buscador.particular/",
-    "resumen": "Nuevos filtros y mejoras de velocidad.",
+    "resumen": "Correcciones y mejoras de accesibilidad.",
     "img": ""
   }
 ]
