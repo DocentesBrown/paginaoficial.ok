@@ -10,14 +10,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root{
-      --azul:#24496e;
-      --crema:#f3efdc;
-      --violeta:#6c467e;
-      --coral:#da6863;
-      --negro:#101418;
-      --gris:#5b6572;
-      --borde:#e7e3d8;
-      --whatsapp:#2b647b;
+      --azul:#24496e; --crema:#f3efdc; --violeta:#6c467e; --coral:#da6863;
+      --negro:#101418; --gris:#5b6572; --borde:#e7e3d8; --whatsapp:#2b647b;
       --space-1:.6rem; --space-2:1rem; --space-3:1.6rem; --space-4:2.4rem;
     }
     *{box-sizing:border-box}
@@ -27,7 +21,7 @@
     header{position:sticky;top:0;background:rgba(243,239,220,.9);backdrop-filter:saturate(180%) blur(8px);border-bottom:1px solid var(--borde);z-index:50}
     nav{display:flex;align-items:center;justify-content:space-between;padding:var(--space-1) 0}
     .brand{display:flex;align-items:center;gap:.65rem;font-weight:800;color:var(--azul);letter-spacing:.2px}
-    .brand svg{width:34px;height:34px}
+    .brand img{height:44px;width:auto;display:block}
     .nav-links{display:flex;gap:.6rem;align-items:center}
     .nav-links a{font-weight:600;color:var(--azul);text-decoration:none;padding:.4rem .6rem;border-radius:10px}
     .nav-links a:hover{background:#eae5d3}
@@ -38,25 +32,30 @@
     .card{background:#fff;border:1px solid var(--borde);border-radius:18px;box-shadow:0 8px 24px rgba(16,20,24,.04)}
     .section-title{color:var(--azul);margin:0 0 .6rem 0}
     .subtitle{color:var(--gris);font-size:1.04rem}
-    /* HERO: carrusel */
-    .news-carousel{position:relative;min-height:360px;margin-block:var(--space-4)}
-    .news-slide{position:relative;isolation:isolate;display:grid;grid-template-columns:1fr;padding:var(--space-3);transition:opacity .3s ease}
-    .news-bg{position:absolute;inset:0;z-index:-1;background-size:cover;background-position:center;filter:brightness(.65)}
-    .news-content{max-width:820px;color:#fff}
-    .news-content h2{margin:.2rem 0 0;font-size:clamp(1.6rem,3vw,2.2rem)}
-    .news-content p{margin:.5rem 0 1rem 0}
+
+    /* HERO */
+    .hero{margin:0}
+    .hero-wrap{position:relative;background:linear-gradient(135deg,var(--violeta),var(--coral));}
+    .news-carousel{position:relative;min-height:360px}
+    .news-slide{position:relative;isolation:isolate;display:grid;grid-template-columns:1fr;min-height:360px;padding:var(--space-3);transition:opacity .3s ease}
+    .news-bg{position:absolute;inset:0;z-index:-1;background-size:cover;background-position:center;filter:brightness(.68)}
+    .news-content{max-width:860px;color:#fff}
+    .news-content h2{margin:.2rem 0 0;font-size:clamp(1.8rem,4vw,2.6rem);line-height:1.15}
+    .news-content p{margin:.6rem 0 1rem 0}
     .news-content .btn-link{background:#ffffffcc;color:#1d2430}
-    .news-controls{position:absolute;inset:auto 0 12px 0;display:flex;align-items:center;justify-content:center;gap:.6rem}
+    .news-controls{position:absolute;left:0;right:0;bottom:12px;display:flex;align-items:center;justify-content:center;gap:.6rem}
     .news-prev,.news-next{border:1px solid var(--borde);background:#fff;border-radius:10px;padding:.3rem .55rem;cursor:pointer}
     .news-dots{display:flex;gap:.35rem}
     .news-dot{width:10px;height:10px;border-radius:999px;background:#ffffff80;border:1px solid #fff;cursor:pointer}
     .news-dot.active{background:#fff}
+
     /* Apps */
     .apps{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
     @media (max-width:920px){.apps{grid-template-columns:1fr 1fr}}
     @media (max-width:620px){.apps{grid-template-columns:1fr}}
     .app-card{padding:1.1rem;display:flex;flex-direction:column;gap:.6rem}
     .app-card h3{margin:.2rem 0;color:var(--azul)}
+
     /* Podcast */
     .audio-list{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem}
     @media (max-width:820px){.audio-list{grid-template-columns:1fr}}
@@ -68,27 +67,33 @@
     .spotify-embed .eq span:nth-child(2){animation-delay:.15s}
     .spotify-embed .eq span:nth-child(3){animation-delay:.3s}
     @keyframes db-eq{0%,100%{transform:scaleY(.4)}50%{transform:scaleY(1.4)}}
+
     /* Noticias (lista) */
     .news-list{display:grid;gap:.8rem}
     .news-item{padding:1rem}
     .news-item h4{margin:.1rem 0;color:var(--violeta)}
-    /* CTA Sumate */
+
+    /* CTA */
     .cta{padding:var(--space-3);display:flex;align-items:center;justify-content:space-between;gap:1rem}
     @media (max-width:820px){.cta{flex-direction:column;align-items:flex-start}}
+
     /* Footer */
     footer{margin-top:var(--space-4);border-top:1px solid var(--borde);padding:1.2rem 0;color:var(--gris)}
     footer a{color:var(--violeta);font-weight:700;text-decoration:none}
+
     /* Floating buttons */
     .floating{position:fixed;right:16px;bottom:16px;display:flex;flex-direction:column;gap:.6rem;z-index:60}
     .floating a{display:inline-flex;align-items:center;gap:.5rem;padding:.7rem .9rem;border-radius:999px;color:#fff;text-decoration:none;box-shadow:0 10px 26px rgba(0,0,0,.15)}
     .floating .wa{background:var(--whatsapp)}
     .floating .cafecito{background:var(--coral)}
+
     /* Dark mode */
     [data-theme="dark"]{--azul:#e5ecf3;--crema:#0f141a;--violeta:#b69ad2;--coral:#ff8a80;--negro:#eef2f6;--gris:#b0bac6;--borde:#2a2f36;--whatsapp:#2b647b}
     [data-theme="dark"] body{background:var(--crema);color:var(--negro)}
-    [data-theme="dark"] header{background:rgba(15,20,26,.85);border-color:var(--borde)}
+    [data-theme="dark"] header{background:rgba(15,20,26,.92);border-color:var(--borde)}
     [data-theme="dark"] .card{background:#131a22;border-color:var(--borde);box-shadow:0 8px 24px rgba(0,0,0,.3)}
     [data-theme="dark"] .nav-links a{color:var(--azul)}
+    [data-theme="dark"] .btn-outline{background:transparent;border-color:#3a4350;color:#e5ecf3}
     @media (prefers-reduced-motion: reduce){
       .news-slide{transition:none}
       .spotify-embed .eq span{animation:none}
@@ -100,14 +105,7 @@
     <div class="container">
       <nav>
         <div class="brand" aria-label="Docentes Brown">
-          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <rect x="6" y="6" width="52" height="52" rx="14" fill="url(#g)"/>
-            <path d="M20 42c0-6 6-10 12-10s12 4 12 10" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
-            <path d="M22 25h20" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
-            <defs><linearGradient id="g" x1="6" y1="6" x2="58" y2="58" gradientUnits="userSpaceOnUse">
-              <stop stop-color="#6c467e"/><stop offset="1" stop-color="#da6863"/></linearGradient></defs>
-          </svg>
-          <span>Docentes Brown</span>
+          <img src="logo-docentes-brown.png" alt="Docentes Brown"/>
         </div>
         <div class="nav-links">
           <a href="#apps">Herramientas</a>
@@ -120,15 +118,17 @@
     </div>
   </header>
 
-  <!-- HERO: carrusel de noticias -->
-  <section class="container">
-    <div class="card" style="padding:0;overflow:hidden">
-      <div id="newsCarousel" class="news-carousel" aria-roledescription="carousel" aria-label="Noticias destacadas">
-        <div class="news-slide" data-index="0"></div>
-        <div class="news-controls">
-          <button class="news-prev" aria-label="Anterior">◀</button>
-          <div class="news-dots" role="tablist" aria-label="Paginación de noticias"></div>
-          <button class="news-next" aria-label="Siguiente">▶</button>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-wrap">
+      <div class="container" style="padding:0">
+        <div id="newsCarousel" class="news-carousel" aria-roledescription="carousel" aria-label="Noticias destacadas">
+          <div class="news-slide" data-index="0"></div>
+          <div class="news-controls">
+            <button class="news-prev" aria-label="Anterior">◀</button>
+            <div class="news-dots" role="tablist" aria-label="Paginación de noticias"></div>
+            <button class="news-next" aria-label="Siguiente">▶</button>
+          </div>
         </div>
       </div>
     </div>
@@ -187,7 +187,7 @@
     </div>
   </section>
 
-  <!-- Sumate (zócalo clickeable al formulario) -->
+  <!-- Sumate -->
   <section id="sumate" class="container">
     <a class="card cta" href="https://forms.gle/TALg7vqSe8f6LzxK8" target="_blank" rel="noopener" style="text-decoration:none;">
       <div>
@@ -196,7 +196,6 @@
       </div>
       <div class="cta-row">
         <span class="btn btn-primary" role="button" aria-label="Abrir formulario de Sumate">Abrir formulario</span>
-        <a class="btn btn-outline" href="#" id="descargarCSV">Descargar plantilla CSV</a>
       </div>
     </a>
   </section>
@@ -219,7 +218,6 @@
   </div>
 
   <script>
-    // Año dinámico
     document.getElementById('year').textContent = new Date().getFullYear();
 
     // Modo oscuro toggle
@@ -233,7 +231,7 @@
       localStorage.setItem('db_theme', next);
     });
 
-    // Fetch JSON con fallback
+    // Helpers
     async function loadJson(url, fallback){
       try{
         const r = await fetch(url, {cache:'no-store'});
@@ -243,75 +241,41 @@
       }catch{ return fallback; }
     }
 
-    // Fallbacks locales (incluyen tu primer podcast y noticia)
     const PODCASTS_FALLBACK = [
-      {
-        titulo:'Episodio 1 — Mapa Escolar',
-        fecha:'2025-10-01',
-        spotify:'https://open.spotify.com/episode/1IaOxq5Gi0xQbEoy2ccDdQ?si=6OWrMns7RuSqpCzhEeKVCw',
-        descripcion:'Charlamos sobre el nuevo Mapa Escolar online.'
-      },
-      {
-        titulo:'Episodio ejemplo — Próximamente',
-        fecha:'2025-09-15',
-        spotify:'https://open.spotify.com/episode/0example3',
-        descripcion:'Plantilla para el próximo episodio.'
-      }
+      {titulo:'Episodio 1 — Mapa Escolar', fecha:'2025-10-01', spotify:'https://open.spotify.com/episode/1IaOxq5Gi0xQbEoy2ccDdQ?si=6OWrMns7RuSqpCzhEeKVCw', descripcion:'Charlamos sobre el nuevo Mapa Escolar online.'},
+      {titulo:'Episodio ejemplo — Próximamente', fecha:'2025-09-15', spotify:'https://open.spotify.com/episode/0example3', descripcion:'Plantilla para el próximo episodio.'}
     ];
-
     const NEWS_FALLBACK = [
-      {
-        titulo:'El nuevo Mapa Escolar ya está online: más rápido e intuitivo',
-        fecha:'2025-10-03',
-        link:'https://abc.gob.ar/noticias/el-nuevo-mapa-escolar-ya-esta-online-mas-rapido-intuitivo-y-con-herramientas-innovadoras',
-        resumen:'La DGCyE presentó la nueva versión con herramientas innovadoras.',
-        img:''
-      },
-      {
-        titulo:'Convocatoria a concursos 2025',
-        fecha:'2025-09-15',
-        link:'https://docentesbrown.github.io/concursos_superior/',
-        resumen:'Se publicaron nuevas bases y condiciones.',
-        img:''
-      },
-      {
-        titulo:'Calculadora Salarial: nueva actualización',
-        fecha:'2025-09-10',
-        link:'https://docentesbrown.github.io/Calculadora.Salarial.Docentes.Brown/',
-        resumen:'Correcciones y mejoras de accesibilidad.',
-        img:''
-      }
+      {titulo:'El nuevo Mapa Escolar ya está online: más rápido e intuitivo', fecha:'2025-10-03', link:'https://abc.gob.ar/noticias/el-nuevo-mapa-escolar-ya-esta-online-mas-rapido-intuitivo-y-con-herramientas-innovadoras', resumen:'La DGCyE presentó la nueva versión con herramientas innovadoras.', img:''},
+      {titulo:'Convocatoria a concursos 2025', fecha:'2025-09-15', link:'https://docentesbrown.github.io/concursos_superior/', resumen:'Se publicaron nuevas bases y condiciones.', img:''},
+      {titulo:'Calculadora Salarial: nueva actualización', fecha:'2025-09-10', link:'https://docentesbrown.github.io/Calculadora.Salarial.Docentes.Brown/', resumen:'Correcciones y mejoras de accesibilidad.', img:''}
     ];
+    let PODCASTS = PODCASTS_FALLBACK;
+    let NEWS = NEWS_FALLBACK;
 
-    let PODCASTS = PODCASTS_FALLBACK; // Para producción, podés cargarlos de podcasts.json
-    let NEWS = NEWS_FALLBACK; // Para producción, podés cargarlos de news.json
-
-    // ---------- Podcast (Spotify embed) ----------
+    // Podcast
     async function initPodcasts(){
       PODCASTS = await loadJson('podcasts.json', PODCASTS_FALLBACK);
       PODCASTS.sort((a,b)=> new Date(b.fecha)-new Date(a.fecha));
       const $pod = document.getElementById('podcastList');
       if(!$pod) return;
-      if(!PODCASTS.length){
-        $pod.innerHTML = '<p class="subtitle">Pronto subimos los primeros episodios.</p>'; return;
-      }
+      if(!PODCASTS.length){ $pod.innerHTML = '<p class="subtitle">Pronto subimos los primeros episodios.</p>'; return; }
       $pod.innerHTML = PODCASTS.map(p=>{
         const url = p.spotify || '#';
-        const embed = url.includes('/embed/') ? url :
-          url.replace('/episode/','/embed/episode/').replace('/show/','/embed/show/');
+        const embed = url.includes('/embed/') ? url : url.replace('/episode/','/embed/episode/').replace('/show/','/embed/show/');
         return `
           <article class="card audio-card">
             <h4>${p.titulo}</h4>
             <p class="subtitle" style="margin:.2rem 0 .6rem 0">${new Date(p.fecha).toLocaleDateString()} — ${p.descripcion||''}</p>
             <div class="spotify-embed">
               <div class="eq" aria-hidden="true"><span></span><span></span><span></span></div>
-              <iframe data-testid="embed-iframe" style="border-radius:12px" src="${embed}" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+              <iframe data-testid="embed-iframe" style="border-radius:12px" src="${embed}" width="100%" height="152" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
             </div>
           </article>`;
       }).join('');
     }
 
-    // ---------- Noticias (lista + carrusel) ----------
+    // Noticias
     let newsPage = 1, pageSize = 6;
     function renderNewsPaged(){
       const $news = document.getElementById('newsList');
@@ -332,14 +296,14 @@
         </article>`).join('');
       if($meta) $meta.textContent = `Página ${newsPage} de ${totalPages} — ${NEWS.length} noticias`;
     }
-
     function buildSlide(n){
-      const bg = n.img ? `<div class='news-bg' style="background-image:url('${n.img}')"></div>` :
-                         `<div class='news-bg' style="background:linear-gradient(135deg,var(--violeta),var(--coral))"></div>`;
+      const bgStyle = n.img && n.img.trim()
+        ? `background-image:linear-gradient(135deg, rgba(108,70,126,.85), rgba(218,104,99,.85)), url('${n.img}')`
+        : `background-image:linear-gradient(135deg, var(--violeta), var(--coral))`;
+      const bg = `<div class='news-bg' style="${bgStyle}"></div>`;
       const link = n.link? `<a class="btn-link" href="${n.link}" target="_blank" rel="noopener">Ver más</a>`: '';
       return `${bg}<div class='news-content'><h2>${n.titulo}</h2><p>${n.resumen||''}</p>${link}</div>`;
     }
-
     function renderNewsTop(){
       const cont = document.getElementById('newsCarousel');
       if(!cont) return;
@@ -356,7 +320,6 @@
       window.__DB_CAROUSEL__ = {items: top, i:0, el:cont, timer:null};
       startCarousel();
     }
-
     function startCarousel(){ const s = window.__DB_CAROUSEL__; stopCarousel(); if(!s) return; s.timer=setInterval(carouselNext,5000); }
     function stopCarousel(){ const s = window.__DB_CAROUSEL__; if(s&&s.timer){ clearInterval(s.timer); s.timer=null; } }
     function carouselNext(){ const s = window.__DB_CAROUSEL__; if(!s) return; s.i=(s.i+1)%s.items.length; renderSlide(); }
@@ -383,7 +346,7 @@
       if(c){ c.addEventListener('mouseenter', stopCarousel); c.addEventListener('mouseleave', startCarousel); }
     }
 
-    // Paginación y RSS Noticias
+    // Paginación y RSS
     document.addEventListener('click', (e)=>{
       if(e.target && e.target.id==='btnNext'){newsPage++; renderNewsPaged();}
       if(e.target && e.target.id==='btnPrev'){newsPage--; renderNewsPaged();}
@@ -405,40 +368,7 @@
       }
     });
 
-    // Descarga de plantilla CSV
-    document.getElementById('descargarCSV').addEventListener('click', (e)=>{
-      e.preventDefault();
-      const headers = ['nombre','zona','localidad','materias(separadas por ;)','modalidad(separadas por ;)','wa','mail'];
-      const example = [
-        ['Naty Suárez','Sur','Adrogué','Matemática;Física','Virtual;Presencial','5491153196358','naty@example.com'],
-        ['Juan Pérez','Centro','Burzaco','Lengua','Presencial','5491133333333','juan@example.com']
-      ].map(r=>r.join(',')).join('\\n');
-      const csv = headers.join(',') + '\\n' + example;
-      const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); a.href = url; a.download = 'plantilla_docentes.csv'; a.click(); URL.revokeObjectURL(url);
-    });
-
-    // Inicializar
     (async ()=>{ await initPodcasts(); await initNews(); })();
-
-    // Auto-tests ligeros
-    (async function runSelfTests(){
-      const results = [];
-      try{
-        const out = await loadJson('data:application/json,%7B%7D', [1,2]);
-        results.push({name:'loadJson fallback', pass: Array.isArray(out) && out.length===2});
-        results.push({name:'#newsCarousel existe', pass: !!document.getElementById('newsCarousel')});
-        results.push({name:'#podcastList existe', pass: !!document.getElementById('podcastList')});
-        const btn = document.getElementById('toggleTheme');
-        const prev = document.documentElement.getAttribute('data-theme')||'light';
-        btn.click(); const after = document.documentElement.getAttribute('data-theme')||'light'; btn.click();
-        results.push({name:'Modo oscuro toggle', pass: prev!==after});
-        const hasSpotify = [...document.querySelectorAll('#podcastList iframe')].length>=1;
-        results.push({name:'Spotify embebido renderiza', pass: hasSpotify});
-        console.log('[DB Tests]', results);
-      }catch(err){ console.error('Error en tests:', err); }
-    })();
   </script>
 </body>
 </html>
