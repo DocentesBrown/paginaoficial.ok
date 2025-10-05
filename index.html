@@ -119,22 +119,22 @@
   </header>
 
   <!-- HERO -->
-  <section class="hero">
-    <div class="hero-wrap">
+
+  <!-- HERO (reemplazado por tablero) -->
+  <section class="hero" id="hero-dashboard">
+    <div class="hero-wrap" style="background:linear-gradient(135deg,var(--violeta),var(--coral));">
       <div class="container" style="padding:0">
-        <div id="newsCarousel" class="news-carousel" aria-roledescription="carousel" aria-label="Noticias destacadas">
-          <div class="news-slide" data-index="0"></div>
-          <div class="news-controls">
-            <button class="news-prev" aria-label="Anterior">◀</button>
-            <div class="news-dots" role="tablist" aria-label="Paginación de noticias"></div>
-            <button class="news-next" aria-label="Siguiente">▶</button>
-          </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:.8rem;padding:.8rem 1rem;">
+          <h2 style="color:#fff;margin:0;font-size:1.2rem;letter-spacing:.2px">Tablero: Escuelas por 1.000 (edad escolar)</h2>
+          <a class="btn-link" href="grafico_docentes_brown.html" target="_blank" rel="noopener" style="background:#ffffffcc">Abrir en pestaña nueva</a>
         </div>
+        <iframe src="grafico_docentes_brown.html" title="Tablero Docentes Brown"
+                style="width:100%;height:820px;border:0;display:block;background:var(--crema)"></iframe>
       </div>
     </div>
   </section>
 
-  <!-- Herramientas -->
+<!-- Herramientas -->
   <section id="apps" class="container">
     <h2 class="section-title">Herramientas</h2>
     <div class="apps">
