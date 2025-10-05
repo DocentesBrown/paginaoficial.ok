@@ -95,40 +95,17 @@
     
     
     
-    @media (prefers-reduced-motion: reduce){
-      .news-slide{transition:none}
+    
       .spotify-embed .eq span{animation:none}
     }
   
 /* === ZÓCALO DESLIZABLE PARA EL MENÚ === */
 header{background:var(--crema);backdrop-filter:none}
-.zocalo-scroll{
-  background:var(--crema);
-  border-top:1px solid var(--borde);
-  border-bottom:1px solid var(--borde);
-  margin-top:.35rem;
-  overflow-x:auto;
-  -webkit-overflow-scrolling:touch;
-  white-space:nowrap;
-  scroll-behavior:smooth;
-  padding:.35rem 0;
-  /* Ocultar barras de scroll */
-  scrollbar-width:none;
-}
-.zocalo-scroll::-webkit-scrollbar{display:none}
-.zocalo-scroll .chip{
-  display:inline-block;
-  margin:0 .35rem;
-  padding:.55rem .9rem;
-  border-radius:999px;
-  background:var(--crema); /* mismo color que el zócalo */
-  color:#000; /* letras negras */
-  text-decoration:none;
-  font-weight:600;
-  border:1px solid transparent;
-}
-.zocalo-scroll .chip:focus{outline:2px solid var(--gris);outline-offset:2px}
-.zocalo-scroll .chip.btn{cursor:pointer}
+
+
+
+
+
 
 /* Compensar layout del nav */
 nav{display:block;padding:.45rem 0}
@@ -136,6 +113,78 @@ nav{display:block;padding:.45rem 0}
 
 /* Botones flotantes semitransparentes */
 .floating{position:fixed;right:16px;bottom:16px;display:flex;flex-direction:column;gap:.6rem;z-index:60}
+.floating a{opacity:.72;transition:opacity .2s ease}
+.floating a:hover{opacity:1}
+
+/* === Affordances para móvil en el zócalo === */
+
+
+
+
+/* Ocultar gradientes según posición */
+
+
+
+
+/* Hint "Deslizá →" (se crea por JS) */
+
+
+  10%{opacity:1;transform:translateY(0)}
+  75%{opacity:1}
+  100%{opacity:0;transform:translateY(-8px)}
+}
+
+/* Respeta reduce motion: no anim y sin auto-nudge visible */
+
+
+/* === Menú hamburguesa minimalista === */
+header{position:sticky;top:0;background:var(--crema);border-bottom:1px solid var(--borde);z-index:60}
+nav{display:flex;align-items:center;justify-content:space-between;padding:.6rem 0}
+.nav-min{display:flex;align-items:center;gap:.6rem}
+.brand{display:flex;align-items:center;gap:.65rem}
+.brand img{height:44px;width:auto;display:block}
+
+.menu-btn{
+  appearance:none;border:0;background:transparent;cursor:pointer;
+  width:42px;height:42px;border-radius:10px;display:grid;place-items:center;
+}
+.menu-btn:focus{outline:2px solid var(--gris);outline-offset:2px}
+.menu-icon{position:relative;width:20px;height:14px}
+.menu-icon::before,.menu-icon::after,.menu-icon span{
+  content:"";position:absolute;left:0;right:0;height:2px;background:var(--azul);border-radius:2px
+}
+.menu-icon::before{top:0}
+.menu-icon span{top:6px}
+.menu-icon::after{bottom:0}
+
+/* Overlay + sheet */
+.menu-overlay{
+  position:fixed;inset:0;background:rgba(16,20,24,.72); /* opaco */
+  opacity:0;pointer-events:none;transition:opacity .2s ease;z-index:90;
+}
+.menu-overlay.open{opacity:1;pointer-events:auto}
+.menu-sheet{
+  position:fixed;top:0;right:0;height:100%;width:min(86vw,360px);
+  background:var(--crema);box-shadow:0 10px 40px rgba(0,0,0,.25);
+  transform:translateX(100%);transition:transform .25s ease;z-index:95;display:flex;flex-direction:column;
+}
+.menu-overlay.open + .menu-sheet{transform:translateX(0)}
+.menu-header{display:flex;align-items:center;justify-content:space-between;padding:1rem 1rem .25rem 1rem}
+.menu-title{font-weight:800;color:var(--azul);letter-spacing:.2px}
+.menu-list{list-style:none;margin:0;padding:1rem;display:flex;flex-direction:column;gap:.6rem}
+.menu-list a{
+  display:block;padding:.75rem .9rem;border-radius:12px;text-decoration:none;
+  color:var(--negro);font-weight:600;border:1px solid var(--borde);
+}
+.menu-list a:hover{background:#ffffffc9}
+.menu-close{
+  appearance:none;border:0;background:transparent;cursor:pointer;padding:.5rem;border-radius:10px;
+}
+.menu-close:focus{outline:2px solid var(--gris);outline-offset:2px}
+@media (min-width:900px){
+  /* En desktop mantenemos el mismo patrón minimal */
+}
+/* Botones flotantes: mantener semitransparencia */
 .floating a{opacity:.72;transition:opacity .2s ease}
 .floating a:hover{opacity:1}
 </style>
@@ -147,15 +196,38 @@ nav{display:block;padding:.45rem 0}
         <div class="brand" aria-label="Docentes Brown">
           <img src="logo-docentes-brown.png" alt="Docentes Brown"/>
         </div>
-        <div class="zocalo-scroll" role="navigation" aria-label="Secciones que podés deslizar">
-          <a class="chip" href="#apps">Herramientas</a>
-          <a class="chip" href="#podcast">Podcast</a>
-          <a class="chip" href="#noticias">Noticias</a>
-          <a class="chip" href="graficos.html">Gráficos</a>
-          <a class="chip" href="#sumate">Sumate</a> </div>
+        
+<div class="nav-min">
+  <button class="menu-btn" id="menuBtn" aria-label="Abrir menú" aria-controls="menuOverlay" aria-expanded="false">
+    <span class="menu-icon"><span></span></span>
+  </button>
+</div>
+
       </nav>
     </div>
   </header>
+  
+<div class="menu-overlay" id="menuOverlay" aria-hidden="true"></div>
+<aside class="menu-sheet" role="dialog" aria-modal="true" aria-label="Menú principal">
+  <div class="menu-header">
+    <div class="menu-title">Menú</div>
+    <button class="menu-close" id="menuClose" aria-label="Cerrar menú">
+      <!-- X icon -->
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+  </div>
+  <ul class="menu-list">
+    <li><a href="#apps">Herramientas</a></li>
+    <li><a href="#podcast">Podcast</a></li>
+    <li><a href="#noticias">Noticias</a></li>
+    <li><a href="graficos.html">Gráficos</a></li>
+    <li><a href="#sumate">Sumate</a></li>
+  </ul>
+</aside>
+
 
   <!-- HERO -->
   <section class="hero">
@@ -258,6 +330,86 @@ nav{display:block;padding:.45rem 0}
 
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
+
+    
+// === Affordances de scroll para el zócalo ===
+(function(){
+  const z = document.querySelector('.zocalo-scroll');
+  if(!z) return;
+
+  // Estado inicial para gradientes
+  function updateEdges(){
+    const atStart = z.scrollLeft <= 0;
+    const atEnd = Math.ceil(z.scrollLeft + z.clientWidth) >= z.scrollWidth;
+    z.classList.toggle('at-start', atStart);
+    z.classList.toggle('at-end', atEnd);
+  }
+  z.addEventListener('scroll', updateEdges, {passive:true});
+  window.addEventListener('resize', updateEdges);
+  setTimeout(updateEdges, 0);
+
+  // Una vez por dispositivo: mostrar hint y realizar un mini "nudge"
+  const seenKey = 'zocalo_hint_shown';
+  const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(!localStorage.getItem(seenKey)){
+    // Hint
+    const hint = document.createElement('div');
+    hint.className = 'zocalo-hint';
+    hint.textContent = 'Deslizá →';
+    // Colocamos el hint relativo al contenedor del header
+    const header = z.closest('header') || document.body;
+    header.style.position = header.style.position || 'relative';
+    header.appendChild(hint);
+
+    // Auto-nudge suave
+    if(!prefersReduced){
+      const delta = Math.min(48, Math.max(24, Math.round(z.clientWidth*0.12)));
+      z.scrollTo({left: delta, behavior:'smooth'});
+      setTimeout(()=>{
+        z.scrollTo({left: 0, behavior:'smooth'});
+      }, 500);
+    }
+
+    // Ocultar y marcar como visto
+    setTimeout(()=>{
+      hint.remove();
+      localStorage.setItem(seenKey, '1');
+    }, 2200);
+  }
+})();
+
+
+    
+// === Menú hamburguesa ===
+(function(){
+  const btn = document.getElementById('menuBtn');
+  const overlay = document.getElementById('menuOverlay');
+  const sheet = document.querySelector('.menu-sheet');
+  const closeBtn = document.getElementById('menuClose');
+  const focusable = () => sheet.querySelector('a,button,input,select,textarea');
+
+  function open(){
+    overlay.classList.add('open');
+    overlay.setAttribute('aria-hidden','false');
+    btn.setAttribute('aria-expanded','true');
+    document.documentElement.style.overflow='hidden';
+    setTimeout(()=>{ (focusable()||closeBtn).focus(); }, 120);
+  }
+  function close(){
+    overlay.classList.remove('open');
+    overlay.setAttribute('aria-hidden','true');
+    btn.setAttribute('aria-expanded','false');
+    document.documentElement.style.overflow='';
+    btn.focus();
+  }
+  btn.addEventListener('click', open);
+  closeBtn.addEventListener('click', close);
+  overlay.addEventListener('click', close);
+  document.addEventListener('keydown', (e)=>{
+    if(e.key==='Escape') close();
+  });
+})();
+
 
     // Helpers
     async function loadJson(url, fallback){
