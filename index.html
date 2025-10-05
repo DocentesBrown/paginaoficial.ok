@@ -99,7 +99,38 @@
       .news-slide{transition:none}
       .spotify-embed .eq span{animation:none}
     }
-  </style>
+  
+    /* --- Mobile menu (overlay) --- */
+    .menu-toggle{display:none;border:1px solid var(--borde);background:#fff;border-radius:10px;padding:.45rem .6rem;cursor:pointer}
+    @media (max-width:860px){
+      .nav-links{display:none}
+      .menu-toggle{display:inline-block}
+    }
+    .mobile-menu{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.35);display:none}
+    .mobile-panel{position:absolute;right:0;top:0;height:100%;width:min(320px,82vw);background:var(--crema);border-left:1px solid var(--borde);box-shadow:-12px 0 30px rgba(0,0,0,.22);transform:translateX(100%);transition:transform .25s ease}
+    .mobile-menu.open{display:block}
+    .mobile-menu.open .mobile-panel{transform:translateX(0)}
+    .mobile-links{display:flex;flex-direction:column;padding:1rem;gap:.6rem}
+    .mobile-links a,.mobile-links button{border:1px solid var(--borde);background:#fff;color:var(--azul);text-decoration:none;border-radius:12px;padding:.75rem .9rem;font-weight:700;text-align:left}
+    .mobile-close{position:absolute;top:8px;right:8px;border:1px solid var(--borde);background:#fff;border-radius:10px;padding:.35rem .55rem;cursor:pointer}
+    [data-theme="dark"] .mobile-panel{background:#141a20}
+    [data-theme="dark"] .mobile-links a,[data-theme="dark"] .mobile-links button{background:#19222c;color:#eef2f6;border-color:#3a4350}
+    [data-theme="dark"] .mobile-close{background:#19222c;color:#eef2f6;border-color:#3a4350}
+
+    /* --- Floating circular buttons --- */
+    .floating{position:fixed;right:16px;bottom:16px;display:flex;flex-direction:column;gap:.55rem;z-index:90}
+    .floating a{width:46px;height:46px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;text-decoration:none;color:#fff;box-shadow:0 10px 26px rgba(0,0,0,.25)}
+    .floating .wa{background:var(--whatsapp)}
+    .floating .cafecito{background:var(--coral)}
+
+    /* --- Buttons contrast improvements --- */
+    .btn{border:none;cursor:pointer;border-radius:14px;padding:.7rem .95rem;font-weight:800;letter-spacing:.2px}
+    .btn-primary{background:linear-gradient(135deg,var(--violeta),var(--coral));color:#fff}
+    .btn-outline{background:#fff;border:1px solid var(--borde);color:var(--azul)}
+    [data-theme="dark"] .btn-outline{background:#19222c;border-color:#5a6370;color:#eef2f6}
+    [data-theme="dark"] .btn-primary{filter:saturate(1.15) brightness(.95)}
+
+    </style>
 </head>
 <body>
   <header>
@@ -108,6 +139,7 @@
         <div class="brand" aria-label="Docentes Brown">
           <img src="logo-docentes-brown.png" alt="Docentes Brown"/>
         </div>
+        <button class="menu-toggle" id="btnMenu" aria-label="Abrir menú">☰</button>
         <div class="nav-links">
           <a href="#apps">Herramientas</a>
           <a href="#podcast">Podcast</a>
@@ -118,7 +150,23 @@
         </div>
       </nav>
     </div>
-  </header>
+  
+  <!-- Off-canvas mobile menu -->
+  <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+    <div class="mobile-panel" role="dialog" aria-label="Menú">
+      <button class="mobile-close" id="btnCloseMenu" aria-label="Cerrar">✕</button>
+      <div class="mobile-links">
+        <a href="#apps" onclick="closeMenu()">Herramientas</a>
+        <a href="#podcast" onclick="closeMenu()">Podcast</a>
+        <a href="#noticias" onclick="closeMenu()">Noticias</a>
+        <a href="graficos.html" onclick="closeMenu()">Gráficos</a>
+        <a href="#sumate" onclick="closeMenu()">Sumate</a>
+        <button id="toggleThemeMobile" class="btn-outline" onclick="toggleTheme()"></button>
+      </div>
+    </div>
+  </div>
+</header>
+
 
   <!-- HERO -->
   <section class="hero">
@@ -372,5 +420,49 @@
 
     (async ()=>{ await initPodcasts(); await initNews(); })();
   </script>
+<script>
+
+  // --- THEME PERSISTENCE & LABEL ---
+  function applyThemeLabel(){
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const desktopBtn = document.getElementById('toggleTheme');
+    const mobileBtn = document.getElementById('toggleThemeMobile');
+    if(desktopBtn){ desktopBtn.textContent = isDark ? 'Modo claro' : 'Modo oscuro'; }
+    if(mobileBtn){ mobileBtn.textContent = isDark ? 'Modo claro' : 'Modo oscuro'; }
+  }
+  function setTheme(theme){
+    document.documentElement.setAttribute('data-theme', theme);
+    try{ localStorage.setItem('db_theme', theme); }catch(e){}
+    applyThemeLabel();
+  }
+  function toggleTheme(){
+    const cur = document.documentElement.getAttribute('data-theme') || 'light';
+    setTheme(cur === 'dark' ? 'light' : 'dark');
+  }
+  // Load saved theme or system preference
+  (function initTheme(){
+    let saved = null;
+    try{ saved = localStorage.getItem('db_theme'); }catch(e){}
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const initial = saved || (prefersDark ? 'dark' : 'light');
+    setTheme(initial);
+  })();
+  // Bind desktop toggle if exists
+  const desktopToggle = document.getElementById('toggleTheme');
+  if(desktopToggle){ desktopToggle.addEventListener('click', toggleTheme); }
+
+  // --- MOBILE MENU LOGIC (overlay, no layout shift) ---
+  const btnMenu = document.getElementById('btnMenu');
+  const mobileMenu = document.getElementById('mobileMenu');
+  const btnCloseMenu = document.getElementById('btnCloseMenu');
+  function openMenu(){ mobileMenu.classList.add('open'); mobileMenu.setAttribute('aria-hidden','false'); }
+  function closeMenu(){ mobileMenu.classList.remove('open'); mobileMenu.setAttribute('aria-hidden','true'); }
+  if(btnMenu){ btnMenu.addEventListener('click', openMenu); }
+  if(btnCloseMenu){ btnCloseMenu.addEventListener('click', closeMenu); }
+  mobileMenu && mobileMenu.addEventListener('click', (e)=>{ if(e.target === mobileMenu) closeMenu(); });
+  // Expose closeMenu for inline onclick on links
+  window.closeMenu = closeMenu;
+
+</script>
 </body>
 </html>
