@@ -125,7 +125,8 @@
     <div class="hero-wrap" style="background:linear-gradient(135deg,var(--violeta,#6c467e),var(--coral,#da6863));">
       <div class="container" style="padding:0">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:.8rem;padding:.8rem 1rem;">
-          <h2 style="color:#fff;margin:0;font-size:1.2rem;letter-spacing:.2px">Tablero: escuelas cada 1.000 habitantes en edad escolar</h2>
+          <h2 style="color:#fff;margin:0;font-size:1.2rem;letter-spacing:.2px">Tablero: Escuelas por 1.000 (edad escolar)</h2>
+          <a class="btn-link" href="#db-chart" style="background:#ffffffcc">Ir al gráfico</a>
         </div>
 
         <div class="panel" style="border-radius:0;padding:12px 12px 4px;background:var(--crema,#f3efdc)">
@@ -189,6 +190,10 @@
     const selTop    = qs('db-topn');
     const chk10k    = qs('db-only10k');
     const btnReset  = qs('db-reset');
+    // Defaults al cargar
+    selTop.value = '10';
+    chk10k.checked = true;
+
 
     const cmp1 = qs('db-cmp1');
     const cmp2 = qs('db-cmp2');
@@ -212,7 +217,7 @@
       }));
       if(q){ rows = rows.filter(d => (d.distrito||'').toLowerCase().includes(q)); }
       if(only10k){ rows = rows.filter(d => d._p_total >= 10000); }
-      rows.sort((a,b)=> (order==='asc' ? (a._val - b._val) : (b._val - a._val)));
+      rows.sort((a,b)=> (order==='asc' ? (b._val - a._val) : (a._val - b._val)));
       const top = parseInt(selTop.value||'0', 10);
       if(top>0) rows = rows.slice(0, top);
       return rows;
@@ -262,14 +267,15 @@
       }
     }
     function resetAll(){
-      selMetric.value='total_por_1000';
+selMetric.value='total_por_1000';
       selOrder.value='desc';
       inpSearch.value='';
-      selTop.value='0';
-      chk10k.checked=false;
+      selTop.value='10';
+      chk10k.checked=true;
       cmp1.value=''; cmp2.value=''; cmp3.value=''; onlyCmp.checked=false;
       draw();
-    }
+    
+}
     selMetric.addEventListener('change', draw);
     selOrder.addEventListener('change', draw);
     inpSearch.addEventListener('input', draw);
