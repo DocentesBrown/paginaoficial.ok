@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard – Docentes Brown (LIVE desde Google Sheets)</title>
+
+  <style>
+    :root{
+      --bar:#24496e; --accent:#ef9963; --bg:#f3efdc; --text:#4d3069; --grid:#6c467e; --white:#ffffff;
+    }
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu;}
+    .container{max-width:1100px;margin:0 auto;padding:24px;}
+    h1{font-size:20px;margin:0 0 8px 0;}
+    p.sub{opacity:.8;margin:0 0 16px 0;}
+    .card{background:var(--white);border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,.08);border:1px solid rgba(0,0,0,.06);}
+    .card-header{padding:14px 16px;border-bottom:1px solid rgba(0,0,0,.06);display:flex;align-items:center;gap:8px;font-weight:700;}
+    .card-body{padding:16px;}
+    .controls{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;}
+    @media (max-width: 880px){ .controls{grid-template-columns:1fr 1fr;} }
+    @media (max-width: 560px){ .controls{grid-template-columns:1fr;} }
+    label{font-size:12px;display:block;margin-bottom:4px;}
+    select,button{width:100%;padding:10px 12px;border-radius:12px;border:1px solid rgba(0,0,0,.15);background:#fff;color:var(--text);}
+    button{background:var(--bar);color:#fff;border:none;cursor:pointer;}
+    button.secondary{background:#fff;color:var(--bar);border:1px solid var(--bar);}
+    .muted{opacity:.7}
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Dashboard – Docentes Brown</h1>
+      <p class="sub">Datos en vivo desde Google Sheets. Si actualizás la hoja, el gráfico refleja los cambios al recargar.</p>
+    </header>
+
+    <section class="card" style="margin-bottom:16px">
+      <div class="card-header">Controles</div>
+      <div class="card-body">
+        <div class="controls" style="margin-bottom:12px">
+          <div>
+            <label>Métrica</label>
+            <select id="metric">
+              <option>Cantidad de concursos cargados</option>
+              <option>Campo de formación</option>
+              <option>Perfil docente más solicitado</option>
+              <option>Módulos totales ofrecidos</option>
+              <option>Carreras con más ofertas publicadas</option>
+              <option>Unidades Curriculares más frecuentes</option>
+              <option>Situación de Revista más común</option>
+            </select>
+          </div>
+          <div>
+            <label>Distrito</label>
+            <select id="district"><option>Todos</option></select>
+          </div>
+          <div>
+            <label>TOP N</label>
+            <select id="topn">
+              <option>10</option>
+              <option>20</option>
+              <option>30</option>
+            </select>
+          </div>
+          <div>
+            <label>&nbsp;</label>
+            <button id="reload" class="secondary">Refrescar datos</button>
+          </div>
+        </div>
+        <p class="muted">Fuente: <code id="src">https://docs.google.com/spreadsheets/d/e/2PACX-1vT10Do7HSuMeIpgeFeQxX4Iar-P7GnVhek7Bnzzp0wAdHxItxEE8jhI5shbcD99iA/pub?gid=353829744&single=true&output=csv</code></p>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-header" id="chartTitle">Cargando datos…</div>
+      <div class="card-body">
+        <canvas id="chart" height="360"></canvas>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const SHEET_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT10Do7HSuMeIpgeFeQxX4Iar-P7GnVhek7Bnzzp0wAdHxItxEE8jhI5shbcD99iA/pub?gid=353829744&single=true&output=csv";
+    const COLORS = { bar: "#24496e", accent: "#ef9963", bg: "#f3efdc", text: "#4d3069", grid: "#6c467e" };
+
+    // Normalización básica de nombres de columnas
+    const stripAccents = (s) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const normCol = (c) => stripAccents(String(c||"").toLowerCase().trim()).replace(/[^a-z0-9]+/g, "_").replace(/_+/g, "_").replace(/^_|_$/g, "");
+
+    function autoFind(columns, { mustAll = [], anyOf = [] } = {}){
+      const norm = Object.fromEntries(columns.map(c => [c, normCol(c)]));
+      for (const real of columns){
+        const n = norm[real];
+        const okAll = mustAll.length===0 || mustAll.every(tok => n.includes(tok));
+        const okAny = anyOf.length===0 || anyOf.some(tok => n.includes(tok));
+        if (okAll && okAny) return real;
+      }
+      return null;
+    }
+
+    function toNum(x){
+      if (x===null || x===undefined) return NaN;
+      const n1 = Number(String(x).replace(/\./g, "").replace(",", "."));
+      const n2 = Number(String(x).replace(/,/g, "."));
+      const n = isNaN(n1) ? n2 : n1;
+      return isNaN(n) ? NaN : n;
+    }
+
+    function byCount(rows, key){
+      const m = new Map();
+      for (const r of rows){
+        const v = (r[key] ?? "").toString().trim();
+        if (!v) continue;
+        m.set(v, (m.get(v)||0) + 1);
+      }
+      return Array.from(m, ([categoria, valor]) => ({ categoria, valor })).sort((a,b)=>b.valor-a.valor);
+    }
+
+    function bySum(rows, catKey, valKey){
+      const m = new Map();
+      for (const r of rows){
+        const cat = (r[catKey] ?? "").toString().trim();
+        const val = toNum(r[valKey]);
+        if (!cat || !isFinite(val)) continue;
+        m.set(cat, (m.get(cat)||0) + val);
+      }
+      return Array.from(m, ([categoria, valor]) => ({ categoria, valor })).sort((a,b)=>b.valor-a.valor);
+    }
+
+    let RAW_ROWS = [];
+    let COLUMNS = [];
+    let MAP = { distrito:null, campo:null, perfil:null, modulos:null, carrera:null, uc:null, revista:null };
+
+    const $metric = document.getElementById('metric');
+    const $district = document.getElementById('district');
+    const $topn = document.getElementById('topn');
+    const $title = document.getElementById('chartTitle');
+    const $reload = document.getElementById('reload');
+    let chart;
+
+    function populateDistricts(){
+      $district.innerHTML = '<option>Todos</option>';
+      if (!MAP.distrito) return;
+      const set = new Set();
+      for (const r of RAW_ROWS){
+        const v = (r[MAP.distrito] ?? '').toString().trim();
+        if (v) set.add(v);
+      }
+      Array.from(set).sort((a,b)=>a.localeCompare(b)).forEach(d => {
+        const opt = document.createElement('option'); opt.textContent = d; $district.appendChild(opt);
+      });
+    }
+
+    function renderChart(data, label){
+      const ctx = document.getElementById('chart');
+      const labels = data.map(d=>d.categoria);
+      const values = data.map(d=>d.valor);
+      const topIndex = values.length ? values.indexOf(Math.max(...values)) : -1;
+      const colors = values.map((_,i)=> i===topIndex ? COLORS.accent : COLORS.bar);
+      if (chart) chart.destroy();
+      chart = new Chart(ctx, {
+        type: 'bar',
+        data: { labels, datasets: [{ label, data: values, backgroundColor: colors, borderWidth: 0 }] },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          scales: {
+            x: { ticks: { color: COLORS.text, maxRotation: 45, minRotation: 45 } },
+            y: { ticks: { color: COLORS.text }, grid: { color: 'rgba(108,70,126,0.2)' } }
+          },
+          plugins: { legend: { display: true, labels: { color: COLORS.text } }, tooltip: { enabled: true } }
+        }
+      });
+    }
+
+    function compute(metric, distrito, topN){
+      const scope = (distrito==='Todos' || !MAP.distrito) ? RAW_ROWS : RAW_ROWS.filter(r => String(r[MAP.distrito] ?? '') === String(distrito));
+
+      if (metric === 'Cantidad de concursos cargados'){
+        if (!MAP.distrito) return [{ categoria: 'Total', valor: scope.length }];
+        if (distrito === 'Todos') return byCount(scope, MAP.distrito).slice(0, topN);
+        return [{ categoria: distrito, valor: scope.length }];
+      }
+
+      if (metric === 'Campo de formación'){
+        if (!MAP.campo) return [];
+        return byCount(scope, MAP.campo).slice(0, topN);
+      }
+
+      if (metric === 'Perfil docente más solicitado'){
+        if (!MAP.perfil) return [];
+        return byCount(scope, MAP.perfil).slice(0, topN);
+      }
+
+      if (metric === 'Módulos totales ofrecidos'){
+        if (!MAP.modulos) return [];
+        if (distrito === 'Todos' && MAP.distrito){
+          return bySum(scope, MAP.distrito, MAP.modulos).slice(0, topN);
+        } else {
+          const total = scope.reduce((acc, r)=> acc + (isFinite(toNum(r[MAP.modulos])) ? toNum(r[MAP.modulos]) : 0), 0);
+          return [{ categoria: distrito==='Todos' ? 'Total' : distrito, valor: total }];
+        }
+      }
+
+      if (metric === 'Carreras con más ofertas publicadas'){
+        if (!MAP.carrera) return [];
+        return byCount(scope, MAP.carrera).slice(0, topN);
+      }
+
+      if (metric === 'Unidades Curriculares más frecuentes'){
+        if (!MAP.uc) return [];
+        return byCount(scope, MAP.uc).slice(0, topN);
+      }
+
+      if (metric === 'Situación de Revista más común'){
+        if (!MAP.revista) return [];
+        return byCount(scope, MAP.revista).slice(0, topN);
+      }
+
+      return [];
+    }
+
+    function refresh(){
+      const metric = $metric.value;
+      const distrito = $district.value;
+      const topN = parseInt($topn.value, 10) || 10;
+      const data = compute(metric, distrito, topN);
+      const scopeTxt = (distrito === 'Todos') ? 'Total' : ('Distrito: ' + distrito);
+      const topTxt = (metric === 'Cantidad de concursos cargados' && distrito !== 'Todos') ? '' : (' (Top ' + topN + ')');
+      $title.textContent = metric + ' — ' + scopeTxt + topTxt;
+      renderChart(data, metric);
+    }
+
+    function autoMap(){
+      // Detectamos por nombre y, si no hay, fallback
+      const cols = COLUMNS;
+      MAP.distrito = autoFind(cols, { anyOf: ['distrito'] });
+      MAP.campo = autoFind(cols, { mustAll: ['campo','form'] }) || autoFind(cols, { anyOf:['campo'] });
+      MAP.perfil = autoFind(cols, { anyOf: ['perfil','perfil_docente','perfil_doc','solicitado'] });
+      MAP.modulos = autoFind(cols, { anyOf: ['modulo','modulos','cantidad_modulos','cant_modulos'] });
+      MAP.carrera = autoFind(cols, { anyOf: ['carrera'] });
+      MAP.uc = autoFind(cols, { mustAll: ['unidad','curricular'] }) || autoFind(cols, { anyOf:['unidad_curricular','u_c'] });
+      MAP.revista = autoFind(cols, { anyOf: ['revista','situacion_revista','situacion_de_revista'] });
+      // Fallback: "Perfil docente más solicitado" = columna 2 (index 1) si no se detecta por nombre
+      if (!MAP.perfil && cols.length >= 2) MAP.perfil = cols[1];
+    }
+
+    function loadData(cb){
+      document.getElementById('chartTitle').textContent = 'Cargando datos…';
+      Papa.parse(SHEET_CSV, {
+        download: true,
+        header: true,
+        skipEmptyLines: true,
+        complete: (res) => {
+          RAW_ROWS = res.data || [];
+          COLUMNS = res.meta?.fields || Object.keys(RAW_ROWS[0]||{});
+          autoMap();
+          populateDistricts();
+          refresh();
+          if (cb) cb();
+        },
+        error: (err) => {
+          console.error(err);
+          document.getElementById('chartTitle').textContent = 'Error al cargar datos';
+          alert('No se pudo cargar el CSV publicado. Verificá que el enlace esté publicado al web y accesible.');
+        }
+      });
+    }
+
+    // Listeners
+    document.getElementById('metric').addEventListener('change', refresh);
+    document.getElementById('district').addEventListener('change', refresh);
+    document.getElementById('topn').addEventListener('change', refresh);
+    document.getElementById('reload').addEventListener('click', () => loadData());
+
+    // Init
+    loadData();
+  </script>
+</body>
+</html>
