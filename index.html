@@ -41,7 +41,6 @@
     .news-carousel{position:relative;min-height:360px}
     .news-slide{position:relative;isolation:isolate;display:grid;grid-template-columns:1fr;min-height:360px;padding:var(--space-3);transition:opacity .3s ease}
     .news-bg{position:absolute;inset:0;z-index:-1;background-size:cover;background-position:center;filter:brightness(.68)}
-    [data-theme="dark"] .news-bg{filter:brightness(.8)}
     .news-content{max-width:860px;color:#fff}
     .news-content h2{margin:.2rem 0 0;font-size:clamp(1.8rem,4vw,2.6rem);line-height:1.15}
     .news-content p{margin:.6rem 0 1rem 0}
@@ -88,13 +87,6 @@
     .floating .cafecito{background:var(--coral)}
 
     /* Dark mode */
-    [data-theme="dark"]{--azul:#e6ecf3;--crema:#141a20;--violeta:#c3addb;--coral:#ff8a80;--negro:#eef2f6;--gris:#c2cad6;--borde:#2a2f36;--whatsapp:#2b647b}
-    [data-theme="dark"] body{background:var(--crema);color:var(--negro)}
-    [data-theme="dark"] header{background:rgba(15,20,26,.92);border-color:var(--borde)}
-    [data-theme="dark"] .card{background:#19222c;border-color:var(--borde);box-shadow:0 8px 24px rgba(0,0,0,.35)}
-    [data-theme="dark"] .nav-links a{color:var(--azul)}
-    [data-theme="dark"] .btn-outline{background:transparent;border-color:#5a6370;color:#eef2f6}
-    [data-theme="dark"] .news-dot{background:#ffffffb3;border-color:#ffffffcc}
     @media (prefers-reduced-motion: reduce){
       .news-slide{transition:none}
       .spotify-embed .eq span{animation:none}
@@ -107,15 +99,11 @@ nav{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:.6rem;pad
 .nav-scroll{display:flex;gap:.6rem;overflow-x:auto;scroll-snap-type:x mandatory;padding:.25rem 0}
 .nav-scroll::-webkit-scrollbar{height:6px}
 .nav-scroll::-webkit-scrollbar-thumb{background:#c8c1ad;border-radius:999px}
-.nav-link{flex:0 0 auto;scroll-snap-align:center;font-weight:700;color:var(--azul);text-decoration:none;padding:.4rem .7rem;border-radius:12px;border:1px solid var(--borde);background:#fff;white-space:nowrap}
-.nav-link:hover{background:#eae5d3}
+.nav-link{flex:0 0 auto;scroll-snap-align:center;font-weight:700;color:var(--azul);text-decoration:none;padding:.45rem .7rem;border-radius:10px;border:none;background:transparent;white-space:nowrap}
+.nav-link:hover{text-decoration:underline}
 .ribbon-arrows{display:none}
 @media (max-width:920px){ .ribbon-arrows{display:flex;gap:.4rem;position:absolute;right:0;top:50%;transform:translateY(-50%)} }
 .ribbon-arrows button{border:1px solid var(--borde);background:#fff;border-radius:10px;padding:.25rem .45rem;cursor:pointer}
-
-[data-theme="dark"] header{background:rgba(20,26,32,.9)}
-[data-theme="dark"] .nav-link{background:#19222c;color:#e6ecf3;border-color:#3a4350}
-[data-theme="dark"] .nav-link:hover{background:#222d3a}
 
 </style>
 </head>
@@ -134,12 +122,9 @@ nav{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:.6rem;pad
           <a class="nav-link" href="#noticias">Noticias</a>
           <a class="nav-link" href="graficos.html">Gráficos</a>
           <a class="nav-link" href="#sumate">Sumate</a>
-          <button class="nav-link" id="toggleTheme" type="button">Modo oscuro</button>
+          
         </div>
-        <div class="ribbon-arrows" aria-hidden="true">
-          <button id="rLeft">◀</button>
-          <button id="rRight">▶</button>
-        </div>
+        
       </div>
     </nav>
   </div>
@@ -399,40 +384,7 @@ nav{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:.6rem;pad
     (async ()=>{ await initPodcasts(); await initNews(); })();
   </script>
 
-<script>
-(function(){
-  function applyThemeLabel(){
-    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    const btn = document.getElementById('toggleTheme');
-    if(btn){ btn.textContent = isDark ? 'Modo claro' : 'Modo oscuro'; }
-  }
-  function setTheme(theme){
-    document.documentElement.setAttribute('data-theme', theme);
-    try{ localStorage.setItem('db_theme', theme); }catch(e){}
-    applyThemeLabel();
-  }
-  function toggleTheme(){
-    const cur = document.documentElement.getAttribute('data-theme') || 'light';
-    setTheme(cur === 'dark' ? 'light' : 'dark');
-  }
-  window.toggleTheme = toggleTheme;
-  // init
-  let saved = null;
-  try{ saved = localStorage.getItem('db_theme'); }catch(e){}
-  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-  setTheme(saved || (prefersDark ? 'dark' : 'light'));
-  // bind
-  const tbtn = document.getElementById('toggleTheme');
-  if(tbtn){ tbtn.addEventListener('click', toggleTheme); }
-  // ribbon arrows
-  const sc = document.getElementById('navScroll');
-  const left = document.getElementById('rLeft');
-  const right = document.getElementById('rRight');
-  function scrollByAmount(dx){ sc && sc.scrollBy({left:dx, behavior:'smooth'}); }
-  left && left.addEventListener('click', ()=>scrollByAmount(-180));
-  right && right.addEventListener('click', ()=>scrollByAmount(180));
-})();
-</script>
+
 
 </body>
 </html>
