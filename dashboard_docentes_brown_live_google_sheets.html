@@ -33,7 +33,7 @@
   <div class="container">
     <header>
       <h1>Dashboard – Docentes Brown</h1>
-      <p class="sub">Datos en vivo desde Google Sheets. Si actualizás la hoja, el gráfico refleja los cambios al recargar.</p>
+      <p class="sub">Datos en vivo desde el Buscador de Concursos.</p>
     </header>
 
     <section class="card" style="margin-bottom:16px">
@@ -44,7 +44,7 @@
             <label>Métrica</label>
             <select id="metric">
               <option>Cantidad de concursos cargados</option>
-              <option>Campo de formación</option>
+              <option>Campo de formación más frecuentes</option>
               <option>Perfil docente más solicitado</option>
               <option>Módulos totales ofrecidos</option>
               <option>Carreras con más ofertas publicadas</option>
@@ -69,7 +69,7 @@
             <button id="reload" class="secondary">Refrescar datos</button>
           </div>
         </div>
-        <p class="muted">Fuente: <code id="src">https://docs.google.com/spreadsheets/d/e/2PACX-1vT10Do7HSuMeIpgeFeQxX4Iar-P7GnVhek7Bnzzp0wAdHxItxEE8jhI5shbcD99iA/pub?gid=353829744&single=true&output=csv</code></p>
+        <p class="muted">Fuente: <code id="src">https://docs.google.com/spreadsheets/d/e/2PACX-1vT10Do7HSuMeIpgeFeQxX4Iar-P7GnVhek7Bnzzp0wAdHxItxEE8jhI5shbcD99iA/pub?output=csv</code></p>
       </div>
     </section>
 
@@ -82,7 +82,7 @@
   </div>
 
   <script>
-    const SHEET_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT10Do7HSuMeIpgeFeQxX4Iar-P7GnVhek7Bnzzp0wAdHxItxEE8jhI5shbcD99iA/pub?gid=353829744&single=true&output=csv";
+    const SHEET_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT10Do7HSuMeIpgeFeQxX4Iar-P7GnVhek7Bnzzp0wAdHxItxEE8jhI5shbcD99iA/pub?output=csv";
     const COLORS = { bar: "#24496e", accent: "#ef9963", bg: "#f3efdc", text: "#4d3069", grid: "#6c467e" };
 
     // Normalización básica de nombres de columnas
@@ -183,7 +183,7 @@
         return [{ categoria: distrito, valor: scope.length }];
       }
 
-      if (metric === 'Campo de formación'){
+      if (metric === 'Campo de formación más frecuente'){
         if (!MAP.campo) return [];
         return byCount(scope, MAP.campo).slice(0, topN);
       }
