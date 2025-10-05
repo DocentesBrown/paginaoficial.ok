@@ -41,7 +41,7 @@
     .news-carousel{position:relative;min-height:360px}
     .news-slide{position:relative;isolation:isolate;display:grid;grid-template-columns:1fr;min-height:360px;padding:var(--space-3);transition:opacity .3s ease}
     .news-bg{position:absolute;inset:0;z-index:-1;background-size:cover;background-position:center;filter:brightness(.68)}
-    [data-theme="dark"] .news-bg{filter:brightness(.8)}
+    
     .news-content{max-width:860px;color:#fff}
     .news-content h2{margin:.2rem 0 0;font-size:clamp(1.8rem,4vw,2.6rem);line-height:1.15}
     .news-content p{margin:.6rem 0 1rem 0}
@@ -88,18 +88,57 @@
     .floating .cafecito{background:var(--coral)}
 
     /* Dark mode */
-    [data-theme="dark"]{--azul:#e6ecf3;--crema:#141a20;--violeta:#c3addb;--coral:#ff8a80;--negro:#eef2f6;--gris:#c2cad6;--borde:#2a2f36;--whatsapp:#2b647b}
-    [data-theme="dark"] body{background:var(--crema);color:var(--negro)}
-    [data-theme="dark"] header{background:rgba(15,20,26,.92);border-color:var(--borde)}
-    [data-theme="dark"] .card{background:#19222c;border-color:var(--borde);box-shadow:0 8px 24px rgba(0,0,0,.35)}
-    [data-theme="dark"] .nav-links a{color:var(--azul)}
-    [data-theme="dark"] .btn-outline{background:transparent;border-color:#5a6370;color:#eef2f6}
-    [data-theme="dark"] .news-dot{background:#ffffffb3;border-color:#ffffffcc}
+    
+    
+    
+    
+    
+    
+    
     @media (prefers-reduced-motion: reduce){
       .news-slide{transition:none}
       .spotify-embed .eq span{animation:none}
     }
-  </style>
+  
+/* === ZÓCALO DESLIZABLE PARA EL MENÚ === */
+header{background:var(--crema);backdrop-filter:none}
+.zocalo-scroll{
+  background:var(--crema);
+  border-top:1px solid var(--borde);
+  border-bottom:1px solid var(--borde);
+  margin-top:.35rem;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  white-space:nowrap;
+  scroll-behavior:smooth;
+  padding:.35rem 0;
+  /* Ocultar barras de scroll */
+  scrollbar-width:none;
+}
+.zocalo-scroll::-webkit-scrollbar{display:none}
+.zocalo-scroll .chip{
+  display:inline-block;
+  margin:0 .35rem;
+  padding:.55rem .9rem;
+  border-radius:999px;
+  background:var(--crema); /* mismo color que el zócalo */
+  color:#000; /* letras negras */
+  text-decoration:none;
+  font-weight:600;
+  border:1px solid transparent;
+}
+.zocalo-scroll .chip:focus{outline:2px solid var(--gris);outline-offset:2px}
+.zocalo-scroll .chip.btn{cursor:pointer}
+
+/* Compensar layout del nav */
+nav{display:block;padding:.45rem 0}
+.brand{display:flex;align-items:center;gap:.65rem}
+
+/* Botones flotantes semitransparentes */
+.floating{position:fixed;right:16px;bottom:16px;display:flex;flex-direction:column;gap:.6rem;z-index:60}
+.floating a{opacity:.72;transition:opacity .2s ease}
+.floating a:hover{opacity:1}
+</style>
 </head>
 <body>
   <header>
@@ -108,14 +147,12 @@
         <div class="brand" aria-label="Docentes Brown">
           <img src="logo-docentes-brown.png" alt="Docentes Brown"/>
         </div>
-        <div class="nav-links">
-          <a href="#apps">Herramientas</a>
-          <a href="#podcast">Podcast</a>
-          <a href="#noticias">Noticias</a>
-          <a href="graficos.html">Gráficos</a>
-          <a href="#sumate">Sumate</a>
-          <button id="toggleTheme" class="btn btn-outline" style="margin-left:.5rem">Modo oscuro</button>
-        </div>
+        <div class="zocalo-scroll" role="navigation" aria-label="Secciones que podés deslizar">
+          <a class="chip" href="#apps">Herramientas</a>
+          <a class="chip" href="#podcast">Podcast</a>
+          <a class="chip" href="#noticias">Noticias</a>
+          <a class="chip" href="graficos.html">Gráficos</a>
+          <a class="chip" href="#sumate">Sumate</a> </div>
       </nav>
     </div>
   </header>
@@ -221,17 +258,6 @@
 
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
-
-    // Modo oscuro toggle
-    const rootHtml = document.documentElement;
-    const savedTheme = localStorage.getItem('db_theme');
-    if(savedTheme){ rootHtml.setAttribute('data-theme', savedTheme); }
-    document.getElementById('toggleTheme').addEventListener('click', ()=>{
-      const currentIsDark = rootHtml.getAttribute('data-theme') === 'dark';
-      const next = currentIsDark ? 'light' : 'dark';
-      rootHtml.setAttribute('data-theme', next);
-      localStorage.setItem('db_theme', next);
-    });
 
     // Helpers
     async function loadJson(url, fallback){
