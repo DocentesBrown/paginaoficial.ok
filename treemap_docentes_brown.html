@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Docentes Brown · Treemap por distrito y nivel</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<style>
+  :root{
+    --azul:#24496e; --crema:#f3efdc; --violeta:#6c467e; --coral:#da6863;
+    --negro:#101418; --gris:#5b6572; --borde:#e7e3d8;
+  }
+  body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--crema);color:var(--negro);margin:0}
+  header{background:linear-gradient(135deg,var(--violeta),var(--coral));color:#fff}
+  .header-wrap{max-width:1100px;margin:0 auto;padding:14px 16px;display:flex;align-items:center;gap:12px}
+  h1{font-size:1.25rem;margin:0}
+  .container{max-width:1100px;margin:0 auto;padding:16px}
+  .panel{background:#fff;border:1px solid var(--borde);border-radius:16px;padding:12px;box-shadow:0 8px 24px rgba(16,20,24,.05)}
+  .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:10px}
+  select,input,button{padding:6px 10px;border-radius:12px;border:1px solid var(--borde);font-weight:600;background:#fff}
+  #chart{width:100%;height:780px}
+  .mini{font-size:.9rem;color:var(--gris)}
+</style>
+</head>
+<body>
+  <header><div class="header-wrap">
+    <h1>Treemap — Distribución de escuelas por Distrito y Nivel</h1>
+  </div></header>
+  <main class="container">
+    <div class="panel">
+      <div class="controls">
+        <label> Agrupar por:
+          <select id="group">
+            <option value="dist_then_level">Distrito → Nivel</option>
+            <option value="level_then_dist">Nivel → Distrito</option>
+          </select>
+        </label>
+        <label> Tamaño por:
+          <select id="metric">
+            <option value="total">Total de escuelas</option>
+            <option value="ini">Inicial (escuelas)</option>
+            <option value="pri">Primario (escuelas)</option>
+            <option value="sec">Secundario (escuelas)</option>
+            <option value="p_total">Población en edad escolar</option>
+          </select>
+        </label>
+        <label>Buscar distrito:
+          <input id="search" type="text" placeholder="Ej: La Plata, Quilmes..." />
+        </label>
+        <label><input type="checkbox" id="only10k" checked/> Solo ≥ 10.000 en edad escolar</label>
+        <label>Top distritos por tamaño:
+          <select id="topn">
+            <option value="0" selected>Todos</option>
+            <option value="10">Top 10</option>
+            <option value="20">Top 20</option>
+            <option value="50">Top 50</option>
+          </select>
+        </label>
+        <button id="btnReset">Restablecer</button>
+      </div>
+      <div id="chart"></div>
+    </div>
+    <p class="mini">Tip: cambiá “Agrupar por” para ver la distribución desde el punto de vista de cada nivel o de cada distrito.</p>
+  </main>
+
+  <script>
+    const RAW = [{"distrito": "La Matanza", "ini": 357, "pri": 363, "sec": 341, "total": 1061, "p_ini": 66998.0, "p_pri": 182010.0, "p_sec": 193508.0, "p_total": 442516.0}, {"distrito": "La Plata", "ini": 237, "pri": 227, "sec": 212, "total": 676, "p_ini": 21814.0, "p_pri": 62415.0, "p_sec": 66555.0, "p_total": 150784.0}, {"distrito": "Lomas de Zamora", "ini": 183, "pri": 194, "sec": 191, "total": 568, "p_ini": 21059.0, "p_pri": 61009.0, "p_sec": 66536.0, "p_total": 148604.0}, {"distrito": "General Pueyrredón", "ini": 197, "pri": 188, "sec": 174, "total": 559, "p_ini": 17552.0, "p_pri": 49623.0, "p_sec": 54188.0, "p_total": 121363.0}, {"distrito": "Quilmes", "ini": 167, "pri": 160, "sec": 153, "total": 480, "p_ini": 19467.0, "p_pri": 56631.0, "p_sec": 61340.0, "p_total": 137438.0}, {"distrito": "Almirante Brown", "ini": 145, "pri": 152, "sec": 148, "total": 445, "p_ini": 17710.0, "p_pri": 53681.0, "p_sec": 58792.0, "p_total": 130183.0}, {"distrito": "Moreno", "ini": 127, "pri": 147, "sec": 141, "total": 415, "p_ini": 21322.0, "p_pri": 60990.0, "p_sec": 64808.0, "p_total": 147120.0}, {"distrito": "Lanús", "ini": 126, "pri": 130, "sec": 116, "total": 372, "p_ini": 11543.0, "p_pri": 34410.0, "p_sec": 39163.0, "p_total": 85116.0}, {"distrito": "Merlo", "ini": 112, "pri": 128, "sec": 126, "total": 366, "p_ini": 19956.0, "p_pri": 57520.0, "p_sec": 61359.0, "p_total": 138835.0}, {"distrito": "Tigre", "ini": 131, "pri": 120, "sec": 108, "total": 359, "p_ini": 13537.0, "p_pri": 39663.0, "p_sec": 45887.0, "p_total": 99087.0}, {"distrito": "Pilar", "ini": 116, "pri": 120, "sec": 105, "total": 341, "p_ini": 14965.0, "p_pri": 39850.0, "p_sec": 43058.0, "p_total": 97873.0}, {"distrito": "Florencio Varela", "ini": 102, "pri": 106, "sec": 104, "total": 312, "p_ini": 19074.0, "p_pri": 52269.0, "p_sec": 54760.0, "p_total": 126103.0}, {"distrito": "General San Martín", "ini": 102, "pri": 108, "sec": 101, "total": 311, "p_ini": 11573.0, "p_pri": 34479.0, "p_sec": 38846.0, "p_total": 84898.0}, {"distrito": "Avellaneda", "ini": 125, "pri": 103, "sec": 76, "total": 304, "p_ini": 9236.0, "p_pri": 28424.0, "p_sec": 32280.0, "p_total": 69940.0}, {"distrito": "Bahía Blanca", "ini": 107, "pri": 110, "sec": 83, "total": 300, "p_ini": 9695.0, "p_pri": 26928.0, "p_sec": 28758.0, "p_total": 65381.0}, {"distrito": "Berazategui", "ini": 100, "pri": 99, "sec": 97, "total": 296, "p_ini": 10452.0, "p_pri": 32012.0, "p_sec": 36001.0, "p_total": 78465.0}, {"distrito": "Morón", "ini": 99, "pri": 104, "sec": 87, "total": 290, "p_ini": 7338.0, "p_pri": 22351.0, "p_sec": 25399.0, "p_total": 55088.0}, {"distrito": "San Isidro", "ini": 101, "pri": 100, "sec": 88, "total": 289, "p_ini": 7242.0, "p_pri": 20286.0, "p_sec": 23438.0, "p_total": 50966.0}, {"distrito": "San Miguel", "ini": 90, "pri": 100, "sec": 97, "total": 287, "p_ini": 10300.0, "p_pri": 29899.0, "p_sec": 31324.0, "p_total": 71523.0}, {"distrito": "Tres de Febrero", "ini": 107, "pri": 93, "sec": 84, "total": 284, "p_ini": 8468.0, "p_pri": 26288.0, "p_sec": 29344.0, "p_total": 64100.0}, {"distrito": "Malvinas Argentinas", "ini": 79, "pri": 83, "sec": 88, "total": 250, "p_ini": 10913.0, "p_pri": 31211.0, "p_sec": 35143.0, "p_total": 77267.0}, {"distrito": "Escobar", "ini": 84, "pri": 83, "sec": 79, "total": 246, "p_ini": 9182.0, "p_pri": 25934.0, "p_sec": 27019.0, "p_total": 62135.0}, {"distrito": "Vicente López", "ini": 85, "pri": 80, "sec": 69, "total": 234, "p_ini": 6279.0, "p_pri": 17652.0, "p_sec": 20131.0, "p_total": 44062.0}, {"distrito": "Esteban Echeverría", "ini": 77, "pri": 81, "sec": 72, "total": 230, "p_ini": 11620.0, "p_pri": 32889.0, "p_sec": 35400.0, "p_total": 79909.0}, {"distrito": "Olavarría", "ini": 65, "pri": 81, "sec": 41, "total": 187, "p_ini": 3527.0, "p_pri": 10340.0, "p_sec": 11317.0, "p_total": 25184.0}, {"distrito": "José C. Paz", "ini": 57, "pri": 67, "sec": 62, "total": 186, "p_ini": 12613.0, "p_pri": 34439.0, "p_sec": 36196.0, "p_total": 83248.0}, {"distrito": "San Fernando", "ini": 66, "pri": 59, "sec": 48, "total": 173, "p_ini": 4679.0, "p_pri": 14089.0, "p_sec": 15399.0, "p_total": 34167.0}, {"distrito": "San Nicolás", "ini": 54, "pri": 62, "sec": 50, "total": 166, "p_ini": 5562.0, "p_pri": 14620.0, "p_sec": 15345.0, "p_total": 35527.0}, {"distrito": "Tandil", "ini": 57, "pri": 67, "sec": 41, "total": 165, "p_ini": 4101.0, "p_pri": 11728.0, "p_sec": 12613.0, "p_total": 28442.0}, {"distrito": "Hurlingham", "ini": 49, "pri": 53, "sec": 51, "total": 153, "p_ini": 4761.0, "p_pri": 14496.0, "p_sec": 16368.0, "p_total": 35625.0}, {"distrito": "Pergamino", "ini": 54, "pri": 60, "sec": 38, "total": 152, "p_ini": 3676.0, "p_pri": 9956.0, "p_sec": 10622.0, "p_total": 24254.0}, {"distrito": "Ezeiza", "ini": 56, "pri": 49, "sec": 45, "total": 150, "p_ini": 7017.0, "p_pri": 20648.0, "p_sec": 21921.0, "p_total": 49586.0}, {"distrito": "Ituzaingó", "ini": 51, "pri": 50, "sec": 47, "total": 148, "p_ini": 4279.0, "p_pri": 13435.0, "p_sec": 15541.0, "p_total": 33255.0}, {"distrito": "Luján", "ini": 53, "pri": 51, "sec": 38, "total": 142, "p_ini": 3493.0, "p_pri": 9874.0, "p_sec": 10588.0, "p_total": 23955.0}, {"distrito": "Necochea", "ini": 44, "pri": 53, "sec": 37, "total": 134, "p_ini": 2864.0, "p_pri": 8367.0, "p_sec": 9123.0, "p_total": 20354.0}, {"distrito": "Zárate", "ini": 46, "pri": 49, "sec": 39, "total": 134, "p_ini": 4240.0, "p_pri": 11956.0, "p_sec": 13361.0, "p_total": 29557.0}, {"distrito": "Azul", "ini": 45, "pri": 60, "sec": 26, "total": 131, "p_ini": 2219.0, "p_pri": 6518.0, "p_sec": 7113.0, "p_total": 15850.0}, {"distrito": "Junín", "ini": 46, "pri": 49, "sec": 35, "total": 130, "p_ini": 3274.0, "p_pri": 8546.0, "p_sec": 8947.0, "p_total": 20767.0}, {"distrito": "Campana", "ini": 41, "pri": 46, "sec": 42, "total": 129, "p_ini": 3367.0, "p_pri": 9821.0, "p_sec": 10954.0, "p_total": 24142.0}, {"distrito": "Mercedes", "ini": 44, "pri": 47, "sec": 24, "total": 115, "p_ini": 2275.0, "p_pri": 6456.0, "p_sec": 6676.0, "p_total": 15407.0}, {"distrito": "Trenque Lauquen", "ini": 43, "pri": 51, "sec": 16, "total": 110, "p_ini": 1770.0, "p_pri": 4485.0, "p_sec": 4483.0, "p_total": 10738.0}, {"distrito": "General Rodríguez", "ini": 40, "pri": 37, "sec": 32, "total": 109, "p_ini": 6080.0, "p_pri": 16699.0, "p_sec": 17657.0, "p_total": 40436.0}, {"distrito": "Chivilcoy", "ini": 35, "pri": 50, "sec": 22, "total": 107, "p_ini": 2063.0, "p_pri": 5717.0, "p_sec": 6347.0, "p_total": 14127.0}, {"distrito": "25 de Mayo", "ini": 39, "pri": 49, "sec": 17, "total": 105, "p_ini": 1158.0, "p_pri": 3089.0, "p_sec": 3235.0, "p_total": 7482.0}, {"distrito": "Tres Arroyos", "ini": 37, "pri": 43, "sec": 23, "total": 103, "p_ini": 1753.0, "p_pri": 5117.0, "p_sec": 5488.0, "p_total": 12358.0}, {"distrito": "San Pedro", "ini": 32, "pri": 44, "sec": 25, "total": 101, "p_ini": 2506.0, "p_pri": 6630.0, "p_sec": 7219.0, "p_total": 16355.0}, {"distrito": "Cañuelas", "ini": 31, "pri": 41, "sec": 29, "total": 101, "p_ini": 2536.0, "p_pri": 7593.0, "p_sec": 8049.0, "p_total": 18178.0}, {"distrito": "Lincoln", "ini": 35, "pri": 45, "sec": 19, "total": 99, "p_ini": 1681.0, "p_pri": 3903.0, "p_sec": 4099.0, "p_total": 9683.0}, {"distrito": "Coronel Suárez", "ini": 36, "pri": 37, "sec": 22, "total": 95, "p_ini": 1255.0, "p_pri": 3431.0, "p_sec": 3709.0, "p_total": 8395.0}, {"distrito": "9 de Julio", "ini": 36, "pri": 37, "sec": 20, "total": 93, "p_ini": 1640.0, "p_pri": 4698.0, "p_sec": 4989.0, "p_total": 11327.0}, {"distrito": "Balcarce", "ini": 33, "pri": 40, "sec": 20, "total": 93, "p_ini": 1590.0, "p_pri": 4148.0, "p_sec": 4336.0, "p_total": 10074.0}, {"distrito": "Chacabuco", "ini": 34, "pri": 39, "sec": 19, "total": 92, "p_ini": 1513.0, "p_pri": 4154.0, "p_sec": 4639.0, "p_total": 10306.0}, {"distrito": "San Vicente", "ini": 33, "pri": 35, "sec": 22, "total": 90, "p_ini": 4191.0, "p_pri": 11591.0, "p_sec": 11823.0, "p_total": 27605.0}, {"distrito": "Bolívar", "ini": 33, "pri": 40, "sec": 15, "total": 88, "p_ini": 1173.0, "p_pri": 3249.0, "p_sec": 3335.0, "p_total": 7757.0}, {"distrito": "Pehuajó", "ini": 33, "pri": 37, "sec": 17, "total": 87, "p_ini": 1516.0, "p_pri": 3905.0, "p_sec": 4259.0, "p_total": 9680.0}, {"distrito": "Chascomús", "ini": 26, "pri": 40, "sec": 19, "total": 85, "p_ini": 1235.0, "p_pri": 3907.0, "p_sec": 4377.0, "p_total": 9519.0}, {"distrito": "Berisso", "ini": 28, "pri": 30, "sec": 25, "total": 83, "p_ini": 3225.0, "p_pri": 9283.0, "p_sec": 9985.0, "p_total": 22493.0}, {"distrito": "La Costa", "ini": 31, "pri": 28, "sec": 23, "total": 82, "p_ini": 3081.0, "p_pri": 8971.0, "p_sec": 9936.0, "p_total": 21988.0}, {"distrito": "General Villegas", "ini": 32, "pri": 32, "sec": 17, "total": 81, "p_ini": 1230.0, "p_pri": 3191.0, "p_sec": 3551.0, "p_total": 7972.0}, {"distrito": "Lobos", "ini": 30, "pri": 37, "sec": 14, "total": 81, "p_ini": 1379.0, "p_pri": 3821.0, "p_sec": 4059.0, "p_total": 9259.0}, {"distrito": "Baradero", "ini": 29, "pri": 29, "sec": 18, "total": 76, "p_ini": 1468.0, "p_pri": 3537.0, "p_sec": 3789.0, "p_total": 8794.0}, {"distrito": "Saladillo", "ini": 26, "pri": 37, "sec": 12, "total": 75, "p_ini": 1183.0, "p_pri": 3066.0, "p_sec": 3277.0, "p_total": 7526.0}, {"distrito": "Villarino", "ini": 26, "pri": 35, "sec": 14, "total": 75, "p_ini": 1128.0, "p_pri": 3012.0, "p_sec": 3169.0, "p_total": 7309.0}, {"distrito": "Coronel de Marina L. Rosales", "ini": 26, "pri": 29, "sec": 19, "total": 74, "p_ini": 0.0, "p_pri": 0.0, "p_sec": 0.0, "p_total": 0.0}, {"distrito": "San Andrés de Giles", "ini": 28, "pri": 30, "sec": 15, "total": 73, "p_ini": 878.0, "p_pri": 2525.0, "p_sec": 2608.0, "p_total": 6011.0}, {"distrito": "Marcos Paz", "ini": 27, "pri": 27, "sec": 17, "total": 71, "p_ini": 2388.0, "p_pri": 7034.0, "p_sec": 7368.0, "p_total": 16790.0}, {"distrito": "Ayacucho", "ini": 22, "pri": 37, "sec": 12, "total": 71, "p_ini": 686.0, "p_pri": 1980.0, "p_sec": 2185.0, "p_total": 4851.0}, {"distrito": "Patagones", "ini": 26, "pri": 31, "sec": 13, "total": 70, "p_ini": 1181.0, "p_pri": 3429.0, "p_sec": 3576.0, "p_total": 8186.0}, {"distrito": "General Alvarado", "ini": 23, "pri": 24, "sec": 19, "total": 66, "p_ini": 1570.0, "p_pri": 4034.0, "p_sec": 4128.0, "p_total": 9732.0}, {"distrito": "Las Flores", "ini": 17, "pri": 40, "sec": 9, "total": 66, "p_ini": 852.0, "p_pri": 2234.0, "p_sec": 2507.0, "p_total": 5593.0}, {"distrito": "Lobería", "ini": 20, "pri": 34, "sec": 10, "total": 64, "p_ini": 579.0, "p_pri": 1497.0, "p_sec": 1600.0, "p_total": 3676.0}, {"distrito": "Mar Chiquita", "ini": 21, "pri": 29, "sec": 14, "total": 64, "p_ini": 1051.0, "p_pri": 2935.0, "p_sec": 3155.0, "p_total": 7141.0}, {"distrito": "Navarro", "ini": 23, "pri": 31, "sec": 9, "total": 63, "p_ini": 645.0, "p_pri": 1805.0, "p_sec": 2037.0, "p_total": 4487.0}, {"distrito": "Presidente Perón", "ini": 23, "pri": 21, "sec": 19, "total": 63, "p_ini": 4398.0, "p_pri": 11721.0, "p_sec": 12392.0, "p_total": 28511.0}, {"distrito": "Brandsen", "ini": 21, "pri": 23, "sec": 16, "total": 60, "p_ini": 1065.0, "p_pri": 3178.0, "p_sec": 3406.0, "p_total": 7649.0}, {"distrito": "Bragado", "ini": 20, "pri": 25, "sec": 15, "total": 60, "p_ini": 1413.0, "p_pri": 3862.0, "p_sec": 4202.0, "p_total": 9477.0}, {"distrito": "Adolfo Alsina", "ini": 21, "pri": 26, "sec": 12, "total": 59, "p_ini": 544.0, "p_pri": 1465.0, "p_sec": 1405.0, "p_total": 3414.0}, {"distrito": "Magdalena", "ini": 21, "pri": 24, "sec": 14, "total": 59, "p_ini": 854.0, "p_pri": 2205.0, "p_sec": 2363.0, "p_total": 5422.0}, {"distrito": "Coronel Pringles", "ini": 21, "pri": 26, "sec": 11, "total": 58, "p_ini": 773.0, "p_pri": 2273.0, "p_sec": 2268.0, "p_total": 5314.0}, {"distrito": "Carlos Casares", "ini": 18, "pri": 25, "sec": 13, "total": 56, "p_ini": 712.0, "p_pri": 2021.0, "p_sec": 2164.0, "p_total": 4897.0}, {"distrito": "Salto", "ini": 21, "pri": 21, "sec": 14, "total": 56, "p_ini": 1376.0, "p_pri": 3562.0, "p_sec": 3854.0, "p_total": 8792.0}, {"distrito": "Exaltación de la Cruz", "ini": 20, "pri": 22, "sec": 13, "total": 55, "p_ini": 1425.0, "p_pri": 3987.0, "p_sec": 4204.0, "p_total": 9616.0}, {"distrito": "General Juan Madariaga", "ini": 19, "pri": 24, "sec": 11, "total": 54, "p_ini": 608.0, "p_pri": 1960.0, "p_sec": 2366.0, "p_total": 4934.0}, {"distrito": "Ensenada", "ini": 18, "pri": 19, "sec": 16, "total": 53, "p_ini": 1968.0, "p_pri": 6082.0, "p_sec": 6751.0, "p_total": 14801.0}, {"distrito": "Ramallo", "ini": 13, "pri": 26, "sec": 13, "total": 52, "p_ini": 1468.0, "p_pri": 3917.0, "p_sec": 4077.0, "p_total": 9462.0}, {"distrito": "Coronel Dorrego", "ini": 20, "pri": 22, "sec": 9, "total": 51, "p_ini": 480.0, "p_pri": 1326.0, "p_sec": 1410.0, "p_total": 3216.0}, {"distrito": "Rivadavia", "ini": 19, "pri": 22, "sec": 10, "total": 51, "p_ini": 766.0, "p_pri": 1930.0, "p_sec": 1952.0, "p_total": 4648.0}, {"distrito": "Daireaux", "ini": 19, "pri": 22, "sec": 9, "total": 50, "p_ini": 577.0, "p_pri": 1664.0, "p_sec": 1734.0, "p_total": 3975.0}, {"distrito": "San Antonio de Areco", "ini": 19, "pri": 20, "sec": 11, "total": 50, "p_ini": 917.0, "p_pri": 2389.0, "p_sec": 2474.0, "p_total": 5780.0}, {"distrito": "Roque Pérez", "ini": 18, "pri": 26, "sec": 6, "total": 50, "p_ini": 469.0, "p_pri": 1261.0, "p_sec": 1351.0, "p_total": 3081.0}, {"distrito": "Rauch", "ini": 20, "pri": 24, "sec": 6, "total": 50, "p_ini": 509.0, "p_pri": 1430.0, "p_sec": 1499.0, "p_total": 3438.0}, {"distrito": "Puan", "ini": 16, "pri": 21, "sec": 12, "total": 49, "p_ini": 434.0, "p_pri": 1179.0, "p_sec": 1221.0, "p_total": 2834.0}, {"distrito": "Tornquist", "ini": 18, "pri": 20, "sec": 11, "total": 49, "p_ini": 411.0, "p_pri": 1247.0, "p_sec": 1267.0, "p_total": 2925.0}, {"distrito": "Arrecifes", "ini": 18, "pri": 21, "sec": 10, "total": 49, "p_ini": 1161.0, "p_pri": 2905.0, "p_sec": 3046.0, "p_total": 7112.0}, {"distrito": "General Paz", "ini": 16, "pri": 26, "sec": 6, "total": 48, "p_ini": 435.0, "p_pri": 1359.0, "p_sec": 1426.0, "p_total": 3220.0}, {"distrito": "Carlos Tejedor", "ini": 18, "pri": 21, "sec": 8, "total": 47, "p_ini": 462.0, "p_pri": 1292.0, "p_sec": 1273.0, "p_total": 3027.0}, {"distrito": "General Alvear", "ini": 15, "pri": 26, "sec": 6, "total": 47, "p_ini": 311.0, "p_pri": 924.0, "p_sec": 921.0, "p_total": 2156.0}, {"distrito": "Monte", "ini": 17, "pri": 19, "sec": 11, "total": 47, "p_ini": 791.0, "p_pri": 2316.0, "p_sec": 2573.0, "p_total": 5680.0}, {"distrito": "Carmen de Areco", "ini": 17, "pri": 20, "sec": 9, "total": 46, "p_ini": 623.0, "p_pri": 1586.0, "p_sec": 1691.0, "p_total": 3900.0}, {"distrito": "Saavedra", "ini": 16, "pri": 20, "sec": 10, "total": 46, "p_ini": 624.0, "p_pri": 1706.0, "p_sec": 1764.0, "p_total": 4094.0}, {"distrito": "Rojas", "ini": 17, "pri": 20, "sec": 8, "total": 45, "p_ini": 784.0, "p_pri": 2137.0, "p_sec": 2395.0, "p_total": 5316.0}, {"distrito": "Guaminí", "ini": 18, "pri": 20, "sec": 7, "total": 45, "p_ini": 345.0, "p_pri": 977.0, "p_sec": 1023.0, "p_total": 2345.0}, {"distrito": "Colón", "ini": 17, "pri": 17, "sec": 11, "total": 45, "p_ini": 853.0, "p_pri": 2290.0, "p_sec": 2476.0, "p_total": 5619.0}, {"distrito": "Tapalqué", "ini": 15, "pri": 23, "sec": 5, "total": 43, "p_ini": 375.0, "p_pri": 979.0, "p_sec": 971.0, "p_total": 2325.0}, {"distrito": "Dolores", "ini": 12, "pri": 22, "sec": 9, "total": 43, "p_ini": 1115.0, "p_pri": 2873.0, "p_sec": 2851.0, "p_total": 6839.0}, {"distrito": "General Viamonte", "ini": 15, "pri": 18, "sec": 8, "total": 41, "p_ini": 761.0, "p_pri": 2164.0, "p_sec": 2062.0, "p_total": 4987.0}, {"distrito": "General Las Heras", "ini": 17, "pri": 17, "sec": 7, "total": 41, "p_ini": 608.0, "p_pri": 1737.0, "p_sec": 1743.0, "p_total": 4088.0}, {"distrito": "Leandro N. Alem", "ini": 14, "pri": 18, "sec": 8, "total": 40, "p_ini": 594.0, "p_pri": 1497.0, "p_sec": 1641.0, "p_total": 3732.0}, {"distrito": "Benito Juárez", "ini": 13, "pri": 16, "sec": 10, "total": 39, "p_ini": 673.0, "p_pri": 1858.0, "p_sec": 1988.0, "p_total": 4519.0}, {"distrito": "Villa Gesell", "ini": 12, "pri": 14, "sec": 13, "total": 39, "p_ini": 1061.0, "p_pri": 3225.0, "p_sec": 3782.0, "p_total": 8068.0}, {"distrito": "Adolfo Gonzales Chaves", "ini": 14, "pri": 16, "sec": 8, "total": 38, "p_ini": 410.0, "p_pri": 1140.0, "p_sec": 1164.0, "p_total": 2714.0}, {"distrito": "General La Madrid", "ini": 14, "pri": 17, "sec": 7, "total": 38, "p_ini": 379.0, "p_pri": 1020.0, "p_sec": 1027.0, "p_total": 2426.0}, {"distrito": "General Belgrano", "ini": 12, "pri": 17, "sec": 8, "total": 37, "p_ini": 682.0, "p_pri": 1883.0, "p_sec": 1914.0, "p_total": 4479.0}, {"distrito": "General Arenales", "ini": 13, "pri": 12, "sec": 10, "total": 35, "p_ini": 524.0, "p_pri": 1341.0, "p_sec": 1287.0, "p_total": 3152.0}, {"distrito": "Suipacha", "ini": 14, "pri": 15, "sec": 6, "total": 35, "p_ini": 429.0, "p_pri": 1121.0, "p_sec": 1163.0, "p_total": 2713.0}, {"distrito": "Alberti", "ini": 12, "pri": 14, "sec": 8, "total": 34, "p_ini": 391.0, "p_pri": 1047.0, "p_sec": 1242.0, "p_total": 2680.0}, {"distrito": "Pinamar", "ini": 13, "pri": 11, "sec": 9, "total": 33, "p_ini": 1262.0, "p_pri": 3650.0, "p_sec": 3980.0, "p_total": 8892.0}, {"distrito": "Laprida", "ini": 12, "pri": 16, "sec": 5, "total": 33, "p_ini": 357.0, "p_pri": 1100.0, "p_sec": 1204.0, "p_total": 2661.0}, {"distrito": "General Pinto", "ini": 11, "pri": 15, "sec": 7, "total": 33, "p_ini": 492.0, "p_pri": 1151.0, "p_sec": 1127.0, "p_total": 2770.0}, {"distrito": "Punta Indio", "ini": 10, "pri": 16, "sec": 6, "total": 32, "p_ini": 379.0, "p_pri": 1108.0, "p_sec": 1163.0, "p_total": 2650.0}, {"distrito": "Castelli", "ini": 8, "pri": 19, "sec": 3, "total": 30, "p_ini": 328.0, "p_pri": 890.0, "p_sec": 840.0, "p_total": 2058.0}, {"distrito": "Capitán Sarmiento", "ini": 11, "pri": 13, "sec": 6, "total": 30, "p_ini": 534.0, "p_pri": 1355.0, "p_sec": 1489.0, "p_total": 3378.0}, {"distrito": "Pila", "ini": 10, "pri": 16, "sec": 2, "total": 28, "p_ini": 153.0, "p_pri": 521.0, "p_sec": 459.0, "p_total": 1133.0}, {"distrito": "Maipú", "ini": 10, "pri": 13, "sec": 5, "total": 28, "p_ini": 348.0, "p_pri": 1022.0, "p_sec": 1026.0, "p_total": 2396.0}, {"distrito": "Florentino Ameghino", "ini": 10, "pri": 10, "sec": 7, "total": 27, "p_ini": 385.0, "p_pri": 969.0, "p_sec": 1167.0, "p_total": 2521.0}, {"distrito": "Hipólito Yrigoyen", "ini": 8, "pri": 10, "sec": 5, "total": 23, "p_ini": 340.0, "p_pri": 906.0, "p_sec": 985.0, "p_total": 2231.0}, {"distrito": "Lezama", "ini": 5, "pri": 13, "sec": 4, "total": 22, "p_ini": 180.0, "p_pri": 528.0, "p_sec": 549.0, "p_total": 1257.0}, {"distrito": "General Guido", "ini": 6, "pri": 14, "sec": 2, "total": 22, "p_ini": 96.0, "p_pri": 265.0, "p_sec": 318.0, "p_total": 679.0}, {"distrito": "General Lavalle", "ini": 9, "pri": 10, "sec": 3, "total": 22, "p_ini": 160.0, "p_pri": 521.0, "p_sec": 529.0, "p_total": 1210.0}, {"distrito": "San Cayetano", "ini": 7, "pri": 11, "sec": 3, "total": 21, "p_ini": 287.0, "p_pri": 705.0, "p_sec": 738.0, "p_total": 1730.0}, {"distrito": "Pellegrini", "ini": 7, "pri": 7, "sec": 4, "total": 18, "p_ini": 280.0, "p_pri": 741.0, "p_sec": 657.0, "p_total": 1678.0}, {"distrito": "Tres Lomas", "ini": 7, "pri": 7, "sec": 3, "total": 17, "p_ini": 286.0, "p_pri": 813.0, "p_sec": 859.0, "p_total": 1958.0}, {"distrito": "Salliqueló", "ini": 6, "pri": 6, "sec": 4, "total": 16, "p_ini": 270.0, "p_pri": 789.0, "p_sec": 826.0, "p_total": 1885.0}, {"distrito": "Monte Hermoso", "ini": 4, "pri": 4, "sec": 3, "total": 11, "p_ini": 267.0, "p_pri": 725.0, "p_sec": 789.0, "p_total": 1781.0}, {"distrito": "Tordillo", "ini": 4, "pri": 5, "sec": 1, "total": 10, "p_ini": 100.0, "p_pri": 270.0, "p_sec": 238.0, "p_total": 608.0}];
+
+    const selGroup = document.getElementById('group');
+    const selMetric = document.getElementById('metric');
+    const inpSearch = document.getElementById('search');
+    const selTop = document.getElementById('topn');
+    const only10k = document.getElementById('only10k');
+    const btnReset = document.getElementById('btnReset');
+
+    function filtered(){
+      const q = (inpSearch.value||'').toLowerCase().trim();
+      const m = selMetric.value;
+      let rows = RAW.map(d => Object.assign({}, d, {_size: Number(d[m])||0}));
+      if(q) rows = rows.filter(d => (d.distrito||'').toLowerCase().includes(q));
+      if(only10k.checked) rows = rows.filter(d => (Number(d.p_total)||0) >= 10000);
+      rows.sort((a,b)=> (b._size - a._size));
+      const top = parseInt(selTop.value||'0',10);
+      if(top>0) rows = rows.slice(0, top);
+      return rows;
+    }
+
+    function buildTreemapData(rows){
+      const mode = selGroup.value;
+      const m = selMetric.value;
+
+      let labels=[], parents=[], values=[], text=[];
+
+      if(mode==='dist_then_level'){
+        labels.push('Escuelas'); parents.push(''); values.push(0); text.push('');
+        rows.forEach(d => {
+          labels.push(d.distrito); parents.push('Escuelas'); values.push(Math.max(0, Number(d[m])||0));
+          text.push(d.distrito + ' — ' + (Number(d[m])||0).toLocaleString('es-AR'));
+        });
+        rows.forEach(d => {
+          const child = (name,val) => {
+            labels.push(name+' — '+d.distrito); parents.push(d.distrito); values.push(Math.max(0,val));
+            text.push(d.distrito + ' · ' + name + ' — ' + (val).toLocaleString('es-AR'));
+          };
+          const vals = { Inicial: Number(d.ini)||0, Primario: Number(d.pri)||0, Secundario: Number(d.sec)||0 };
+          if(m==='ini') child('Inicial', vals['Inicial']);
+          else if(m==='pri') child('Primario', vals['Primario']);
+          else if(m==='sec') child('Secundario', vals['Secundario']);
+          else { child('Inicial', vals['Inicial']); child('Primario', vals['Primario']); child('Secundario', vals['Secundario']); }
+        });
+      } else {
+        labels.push('Escuelas'); parents.push(''); values.push(0); text.push('');
+        const levels = [{key:'ini', name:'Inicial'}, {key:'pri', name:'Primario'}, {key:'sec', name:'Secundario'}];
+        levels.forEach(L => {
+          const sumLevel = rows.reduce((acc,r)=> acc + (Number(r[L.key])||0), 0);
+          labels.push(L.name); parents.push('Escuelas'); values.push(Math.max(0, sumLevel)); text.push(L.name);
+        });
+        rows.forEach(d => {
+          const mk = (key, name) => {
+            const val = Number(d[key])||0;
+            labels.push(d.distrito+' — '+name); parents.push(name); values.push(Math.max(0, val));
+            text.push(name + ' · ' + d.distrito + ' — ' + (val).toLocaleString('es-AR'));
+          };
+          mk('ini','Inicial'); mk('pri','Primario'); mk('sec','Secundario');
+        });
+      }
+
+      return {labels, parents, values, text};
+    }
+
+    function draw(){
+      const rows = filtered();
+      const tre = buildTreemapData(rows);
+      const trace = {
+        type:'treemap',
+        labels: tre.labels,
+        parents: tre.parents,
+        values: tre.values,
+        text: tre.text,
+        hovertemplate: '%{text}<extra></extra>',
+        textinfo: 'label+value'
+      };
+      const layout = { margin: {t:20,l:10,r:10,b:10} };
+      Plotly.newPlot('chart', [trace], layout, {responsive:true, displayModeBar:true});
+    }
+
+    selGroup.addEventListener('change', draw);
+    selMetric.addEventListener('change', draw);
+    inpSearch.addEventListener('input', draw);
+    selTop.addEventListener('change', draw);
+    only10k.addEventListener('change', draw);
+    btnReset.addEventListener('click', ()=>{
+      selGroup.value='dist_then_level';
+      selMetric.value='total';
+      inpSearch.value='';
+      selTop.value='0';
+      only10k.checked=true;
+      draw();
+    });
+
+    draw();
+  </script>
+</body>
+</html>
